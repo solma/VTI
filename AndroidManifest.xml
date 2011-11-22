@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="com.social" android:versionCode="1" android:versionName="1.0">
+	<application android:icon="@drawable/icon" android:label="@string/app_name">
+		<activity android:name=".SplashScreen" android:label="@string/app_name"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+			android:screenOrientation="portrait" android:launchMode="singleTask">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+				<category android:name="android.intent.category.BROWSABLE"></category>
+				<data android:scheme="VTI" android:host="twitter"></data>
+			</intent-filter>
+		</activity>
+		<activity android:name="SocialFeed"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+			android:screenOrientation="portrait" android:launchMode="singleTask"></activity>
+		<activity android:name="AboutUs"></activity>
+		<receiver android:name="AlarmReceiver" android:enabled="true">
+		</receiver>
+		<reciever android:name="com.social.BatteryBroadcastReceiver">
+			<intent-filter>
+				<!-- <action android:name="android.intent.action.BOOT_COMPLETED" />  -->
+				<action android:name="android.intent.action.ACTION_BATTERY_CHANGED" />
+			</intent-filter>
+		</reciever>
+		<service android:name="com.social.services.SocialServiceImpl" />
+	</application>
+
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.BATTERY_STATS"/>
+	<uses-sdk android:minSdkVersion="8" />
+
+</manifest> 

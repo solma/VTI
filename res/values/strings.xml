@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="hello">Add your social accounts !</string>
+	<string name="app_name">VTI</string>
+	<string name="twitter">Twitter</string>
+	<string name="facebook">Facebook</string>
+	<string name="buzz">Buzz</string>
+	<string name="tweet">Tweet</string>
+	<string name="settings">Settings</string>
+	<string name="about_us">About Us</string>
+	<string name="twits">Twits</string>
+
+	<string name="apply">Apply</string>
+	<string name="cancel">Cancel</string>
+	<string name="remove_account">Remove Account</string>
+	
+	<string name="about_us_txt">VTI is a crowd-sourcing real-tie traveler information pub/sub application implemented by Sol Ma. </string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:orientation="vertical">
+	<RelativeLayout  android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:background="@drawable/screen_background">
+		<TextView android:id="@+id/title" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="@string/twits"
+			android:layout_alignParentLeft="true" android:textSize="28dip"
+			android:paddingLeft="10dip" android:gravity="center_vertical"></TextView>
+		<ImageButton android:id="@+id/force_refresh"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_alignParentRight="true" android:background="@drawable/refresh_button"></ImageButton>
+	</RelativeLayout>
+	<ListView android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:id="@android:id/list"></ListView>
+</LinearLayout>

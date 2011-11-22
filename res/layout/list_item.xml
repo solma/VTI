@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:background="@drawable/list_item_background">
+
+	<ImageView android:id="@+id/profileImage"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:src="@drawable/placeholder_icon" 
+		android:padding="10dip"
+		android:layout_centerVertical="true">
+	</ImageView>
+	<TextView android:id="@+id/profileName" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_toRightOf="@id/profileImage"
+		android:textSize="16sp" android:text="Profile Name" android:textColor="#FF0000">
+	</TextView>
+	<TextView android:id="@+id/twitMessage" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:textSize="14sp"
+		android:layout_below="@id/profileName" android:layout_alignLeft="@id/profileName"
+		android:minLines="5">
+	</TextView>
+</RelativeLayout>
+

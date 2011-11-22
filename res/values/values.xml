@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<array name="refresh_rates">
+		<item>1</item>
+		<item>5</item>
+		<item>30</item>
+	</array>
+	
+</resources>

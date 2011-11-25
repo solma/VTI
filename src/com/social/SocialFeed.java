@@ -58,7 +58,6 @@ public class SocialFeed extends ListActivity {
 	private class FetchFromDBTask extends
 			AsyncTask<OAuthTokens, Void, List<Twit>> {
 		private ProgressDialog dialog = new ProgressDialog(SocialFeed.this);
-
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -155,7 +154,6 @@ public class SocialFeed extends ListActivity {
 	};
 
 	private class TweetAsyncTask extends AsyncTask<String, Void, Void> {
-
 		@Override
 		protected Void doInBackground(final String... params) {
 			final FeedManager feedManager = new FeedManager(
@@ -164,15 +162,10 @@ public class SocialFeed extends ListActivity {
 					getApplicationContext());
 			if (!authMgr.isAuthenticationRequired()) {
 				feedManager.tweet(params[0], authMgr.getAuthTokens());
-
 			}
-
 			return null;
 		}
-
 		/*
-		 * (non-Javadoc)
-		 * 
 		 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
 		 */
 		@Override
@@ -181,7 +174,6 @@ public class SocialFeed extends ListActivity {
 			super.onPostExecute(result);
 			refreshButton.performClick();
 		}
-
 	};
 
 	private ServiceConnection connection = new ServiceConnection() {
@@ -295,7 +287,7 @@ public class SocialFeed extends ListActivity {
 		case R.id.about_us:
 			handleAboutUs();
 		case R.id.follow_unfollow:
-			handleFollow();
+			handleFollowUnfollow();
 		default:
 			return false;
 		}
@@ -304,8 +296,48 @@ public class SocialFeed extends ListActivity {
 	/**
 	 * handle follow/unfollow click
 	 */
-	private void handleFollow() {
+	private void handleFollowUnfollow() {
+		final Dialog dialog = new Dialog(this);
+		dialog.setTitle(R.string.follow_unfollow);
+		dialog.setContentView(R.layout.follow_unfollow);
 
+		final Button followButton = (Button) dialog.findViewById(R.id.follow);
+		final Button unfollowButton = (Button) dialog.findViewById(R.id.unfollow);
+		final Button cancelButton = (Button) dialog
+				.findViewById(R.id.cancel_button);
+		final EditText tweetText = (EditText) dialog
+				.findViewById(R.id.tweet_text);
+
+		followButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				dialog.cancel();
+				//TODO: implement following functions
+				//TweetAsyncTask tweetAsyncTask = new TweetAsyncTask();
+				//tweetAsyncTask.execute(tweetText.getText().toString());
+
+			}
+		});
+		
+		unfollowButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				dialog.cancel();
+				//TODO: implement unfollowing functions
+				//TweetAsyncTask tweetAsyncTask = new TweetAsyncTask();
+				//tweetAsyncTask.execute(tweetText.getText().toString());
+
+			}
+		});
+	
+		cancelButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				dialog.cancel();
+			}
+		});
+
+		dialog.show();
 	}
 
 	/**

@@ -56,23 +56,25 @@ public class SocialServiceImpl extends Service {
 				final DBAdapter dbAdapter = new DBAdapter(
 						getApplicationContext());
 				dbAdapter.open();
-				for (final Twit twit : twits) {
-					final long noOfRowsEffected = dbAdapter.updateTwit(
-							twit.getTwitId(), twit.getProfileName(),
-							twit.getImageUrl(), twit.getTwitMessage());
-					Log.d(TAG, "GetCurrentSF: "+twit.getProfileName()+" "+twit.getTwitMessage() );
-					// Check for new twit
-					if (noOfRowsEffected < 1) {
-						// Insert if not already present
-						dbAdapter.insertTwit(twit.getTwitId(),
-								twit.getProfileName(), twit.getImageUrl(),
-								twit.getTwitMessage());
-						
+				if (twits != null)
+					for (final Twit twit : twits) {
+						final long noOfRowsEffected = dbAdapter.updateTwit(
+								twit.getTwitId(), twit.getProfileName(),
+								twit.getImageUrl(), twit.getTwitMessage());
+						Log.d(TAG, "GetCurrentSF: " + twit.getProfileName()
+								+ " " + twit.getTwitMessage());
+						// Check for new twit
+						if (noOfRowsEffected < 1) {
+							// Insert if not already present
+							dbAdapter.insertTwit(twit.getTwitId(),
+									twit.getProfileName(), twit.getImageUrl(),
+									twit.getTwitMessage());
+
+						}
 					}
-				}
 				dbAdapter.close();
 				return twits;
-				//return getDBTwits();
+				// return getDBTwits();
 			} else {
 				return new ArrayList<Twit>();
 			}
@@ -94,7 +96,9 @@ public class SocialServiceImpl extends Service {
 					dbTwits.add(new Twit(cursor.getLong(0),
 							cursor.getString(1), cursor.getString(2), cursor
 									.getString(3)));
-					Log.d(TAG, "GetDB: "+cursor.getString(1)+" "+cursor.getString(3) );
+					Log.d(TAG,
+							"GetDB: " + cursor.getString(1) + " "
+									+ cursor.getString(3));
 				}
 
 				return dbTwits;
@@ -165,21 +169,23 @@ public class SocialServiceImpl extends Service {
 					final DBAdapter dbAdapter = new DBAdapter(
 							getApplicationContext());
 					dbAdapter.open();
-					for (final Twit twit : twits) {
-						final long noOfRowsEffected = dbAdapter.updateTwit(
-								twit.getTwitId(), twit.getProfileName(),
-								twit.getImageUrl(), twit.getTwitMessage());
-						// Check for new twit
-						if (noOfRowsEffected < 1) {
-							// Insert and mark for notification
-							dbAdapter.insertTwit(twit.getTwitId(),
-									twit.getProfileName(), twit.getImageUrl(),
-									twit.getTwitMessage());
-							// Notify so that user comes to know about this
-							sendNotification = true;
-						}
+					if (twits != null)
+						for (final Twit twit : twits) {
+							final long noOfRowsEffected = dbAdapter.updateTwit(
+									twit.getTwitId(), twit.getProfileName(),
+									twit.getImageUrl(), twit.getTwitMessage());
+							// Check for new twit
+							if (noOfRowsEffected < 1) {
+								// Insert and mark for notification
+								dbAdapter.insertTwit(twit.getTwitId(),
+										twit.getProfileName(),
+										twit.getImageUrl(),
+										twit.getTwitMessage());
+								// Notify so that user comes to know about this
+								sendNotification = true;
+							}
 
-					}
+						}
 					if (sendNotification) {
 						sendNotification();
 					}

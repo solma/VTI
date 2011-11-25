@@ -40,7 +40,7 @@ public class SplashScreen extends Activity {
 	private static final String TAG = SplashScreen.class.getSimpleName() ;
 	//public static final String TWITTER_KEY = "QFgKeMtBipewO4IG0rCNvw";
 	//public static final String TWITTER_SECRET = "OLUqNsO5oSRrv8MgjAHZ0zgHx60tHzfQ7P3dbzzZPoI";
-	private static final String CALLBACK_URL = TAG +"://twitter";
+	private static final String CALLBACK_URL = "VTI://twitter";
 
 	private OAuthSignpostClient client;
 	private ImageButton twitterButton;

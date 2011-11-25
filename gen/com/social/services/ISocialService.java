@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /home/administrator/workspace/android/VTI/complete-app/src/com/social/services/ISocialService.aidl
+ * Original file: E:\\eclipse\\workspace\\VTI\\src\\com\\social\\services\\ISocialService.aidl
  */
 package com.social.services;
 public interface ISocialService extends android.os.IInterface

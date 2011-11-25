@@ -251,9 +251,9 @@ public class SocialFeed extends ListActivity {
 			try {
 				result = socialService.getCurrentSocialFeed();
 				// Nothing found in database so do a force fetch
-				//if ((null == result) || (result.size() == 0)) {
-					//result = socialService.getCurrentSocialFeed();
-				//}
+				// if ((null == result) || (result.size() == 0)) {
+				// result = socialService.getCurrentSocialFeed();
+				// }
 			} catch (final RemoteException e) {
 				Log.e(TAG, "Got Exception in getSocialFeed() " + e.getMessage());
 			}
@@ -294,9 +294,18 @@ public class SocialFeed extends ListActivity {
 			return true;
 		case R.id.about_us:
 			handleAboutUs();
+		case R.id.follow_unfollow:
+			handleFollow();
 		default:
 			return false;
 		}
+	}
+
+	/**
+	 * handle follow/unfollow click
+	 */
+	private void handleFollow() {
+
 	}
 
 	/**

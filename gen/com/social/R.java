@@ -66,17 +66,18 @@ public final class R {
     }
     public static final class string {
         public static final int about_us=0x7f040007;
-        public static final int about_us_txt=0x7f04000c;
+        public static final int about_us_txt=0x7f04000d;
         public static final int app_name=0x7f040001;
-        public static final int apply=0x7f040009;
+        public static final int apply=0x7f04000a;
         public static final int buzz=0x7f040004;
-        public static final int cancel=0x7f04000a;
+        public static final int cancel=0x7f04000b;
         public static final int facebook=0x7f040003;
+        public static final int follow_unfollow=0x7f040008;
         public static final int hello=0x7f040000;
-        public static final int remove_account=0x7f04000b;
+        public static final int remove_account=0x7f04000c;
         public static final int settings=0x7f040006;
         public static final int tweet=0x7f040005;
-        public static final int twits=0x7f040008;
+        public static final int twits=0x7f040009;
         public static final int twitter=0x7f040002;
     }
 }

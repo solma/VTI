@@ -5,7 +5,7 @@
 	android:background="#101010" android:minWidth="300dip">
 
 	<EditText android:id="@+id/tweet_text" android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="wrap_content" android:hint="please enter the accounts you want to follow/unfollow, names separated by semicolon ;"
 		android:minLines="4"></EditText>
 	
 	<LinearLayout android:layout_width="fill_parent"

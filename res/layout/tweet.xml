@@ -12,7 +12,7 @@
 		android:layout_height="wrap_content">
 		<Button android:id="@+id/tweet" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:layout_weight="1"
-			android:text="@string/tweet"></Button>
+			android:text="@string/publish"></Button>
 		<Button android:id="@+id/cancel_button" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:layout_weight="1"
 			android:text="@string/cancel"></Button>

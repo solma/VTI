@@ -1,0 +1,2 @@
+1. project.properties is named as default.properties in linux.
+2. For imported Android projects, eclipse will not use graphical layout editor to open xml files by default. 

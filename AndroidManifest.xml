@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.social" android:versionCode="1" android:versionName="1.0">
+	package="com.vti" android:versionCode="1" android:versionName="1.0">
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<activity android:name=".SplashScreen" android:label="@string/app_name"
 			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
@@ -22,13 +22,13 @@
 		<activity android:name="AboutUs"></activity>
 		<receiver android:name="AlarmReceiver" android:enabled="true">
 		</receiver>
-		<reciever android:name="com.social.BatteryBroadcastReceiver">
+		<reciever android:name="com.vti.BatteryBroadcastReceiver">
 			<intent-filter>
 				<!-- <action android:name="android.intent.action.BOOT_COMPLETED" />  -->
 				<action android:name="android.intent.action.ACTION_BATTERY_CHANGED" />
 			</intent-filter>
 		</reciever>
-		<service android:name="com.social.services.SocialServiceImpl" />
+		<service android:name="com.vti.services.SocialServiceImpl" />
 	</application>
 
 	<uses-permission android:name="android.permission.INTERNET" />

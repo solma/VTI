@@ -55,15 +55,16 @@ public class SocialServiceImpl extends Service {
 					for (final Twit twit : twits) {
 						final long noOfRowsEffected = dbAdapter.updateTwit(
 								twit.getTwitId(), twit.getProfileName(),
-								twit.getImageUrl(), twit.getTwitMessage());
+								twit.getImageUrl(), twit.getTwitMessage(),
+								twit.getUpThumbs(), twit.getDownThumbs());
 						Log.d(TAG, "GetCurrentSF: " + twit.getProfileName()
 								+ " " + twit.getTwitMessage());
 						// Check for new twit
 						if (noOfRowsEffected < 1) {
 							// Insert if not already present
-							dbAdapter.insertTwit(twit.getTwitId(),
-									twit.getProfileName(), twit.getImageUrl(),
-									twit.getTwitMessage());
+							dbAdapter.insertTwit(twit.getTwitId(), twit.getProfileName(), 
+									twit.getImageUrl(),	twit.getTwitMessage(),
+									twit.getUpThumbs(), twit.getDownThumbs());
 
 						}
 					}
@@ -166,14 +167,14 @@ public class SocialServiceImpl extends Service {
 						for (final Twit twit : twits) {
 							final long noOfRowsEffected = dbAdapter.updateTwit(
 									twit.getTwitId(), twit.getProfileName(),
-									twit.getImageUrl(), twit.getTwitMessage());
+									twit.getImageUrl(), twit.getTwitMessage(),
+									twit.getUpThumbs(), twit.getDownThumbs());
 							// Check for new twit
 							if (noOfRowsEffected < 1) {
 								// Insert and mark for notification
-								dbAdapter.insertTwit(twit.getTwitId(),
-										twit.getProfileName(),
-										twit.getImageUrl(),
-										twit.getTwitMessage());
+								dbAdapter.insertTwit(twit.getTwitId(), twit.getProfileName(),
+										twit.getImageUrl(), twit.getTwitMessage(),
+										twit.getUpThumbs(), twit.getDownThumbs());
 								// Notify so that user comes to know about this
 								sendNotification = true;
 							}

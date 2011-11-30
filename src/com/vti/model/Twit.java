@@ -26,6 +26,9 @@ public class Twit implements Parcelable {
 	private String imageUrl;
 	private String profileName;
 	private String twitMessage;
+	private long upThumbs;
+	private long downThumbs;
+
 
 	public static final Parcelable.Creator<Twit> CREATOR = new Parcelable.Creator<Twit>() {
 		public Twit createFromParcel(Parcel in) {
@@ -52,6 +55,8 @@ public class Twit implements Parcelable {
 		this.imageUrl = imageUrl;
 		this.profileName = profileName;
 		this.twitMessage = twitMessage;
+		this.upThumbs=0;
+		this.downThumbs=0;
 	}
 
 	/**
@@ -81,12 +86,28 @@ public class Twit implements Parcelable {
 	public String getTwitMessage() {
 		return twitMessage;
 	}
+	
+	/**
+	 * @return # of up thumbs
+	 */
+	public long getUpThumbs() {
+		return upThumbs;
+	}
+	
+	/**
+	 * @return # of down thumbs
+	 */
+	public long getDownThumbs() {
+		return downThumbs;
+	}
 
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeLong(twitId);
 		out.writeString(imageUrl);
 		out.writeString(profileName);
 		out.writeString(twitMessage);
+		out.writeLong(upThumbs);
+		out.writeLong(downThumbs);
 	}
 
 	public void readFromParcel(Parcel in) {
@@ -94,8 +115,8 @@ public class Twit implements Parcelable {
 		this.imageUrl = in.readString();
 		this.profileName = in.readString();
 		this.profileName = in.readString();
-		
-		
+		this.upThumbs=in.readLong();
+		this.downThumbs=in.readLong();
 	}
 
 	public int describeContents() {

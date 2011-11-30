@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -81,7 +82,18 @@ public class TwitAdapter extends BaseAdapter {
 		final TextView twitMessage = (TextView) row
 				.findViewById(R.id.twitMessage);
 		twitMessage.setText(twit.getTwitMessage());
-
+		
+		//set up/down Thumbs button visible
+		final ImageButton upThumbs_button=(ImageButton)row.findViewById(R.id.upThumbsPic);
+		final ImageButton downThumbs_button=(ImageButton)row.findViewById(R.id.downThumbsPic);
+		upThumbs_button.setVisibility(View.VISIBLE);
+		downThumbs_button.setVisibility(View.VISIBLE);
+		
+		// update the upThumbs and downThumbs
+		final TextView upThumbs = (TextView) row.findViewById(R.id.upThumbsNum);
+		upThumbs.setText(Long.toString(twit.getUpThumbs()));
+		final TextView downThumbs = (TextView) row.findViewById(R.id.downThumbsNum);
+		upThumbs.setText(Long.toString(twit.getDownThumbs()));
 		return row;
 	}
 

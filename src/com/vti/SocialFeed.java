@@ -310,7 +310,7 @@ public class SocialFeed extends ListActivity {
 			handleSettings();
 			return true;
 		case R.id.publish:
-			handleTweet();
+			handlePublish();
 			return true;
 		case R.id.about_us:
 			handleAboutUs();
@@ -376,10 +376,10 @@ public class SocialFeed extends ListActivity {
 	/**
 	 * handle tweet click
 	 */
-	private void handleTweet() {
+	private void handlePublish() {
 		final Dialog dialog = new Dialog(this);
 		dialog.setTitle(R.string.publish);
-		dialog.setContentView(R.layout.tweet);
+		dialog.setContentView(R.layout.publish);
 
 		final Button tweetButton = (Button) dialog.findViewById(R.id.tweet);
 		final Button cancelButton = (Button) dialog

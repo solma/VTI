@@ -1,0 +1,5 @@
+1. twitter.getOAuthRequestToken(Constants.CALLBACK_URL) returns errors 
+after the removal of an old account and then try to login again.
+
+2. When the virtual server is not up (but router is up), clicking on Votes up/down button waits for long time (more than 2mins)
+During which click on other buttons will crash the application. 

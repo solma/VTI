@@ -13,12 +13,11 @@
 		<Button android:id="@+id/follow" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:layout_weight="1"
 			android:text="@string/follow"></Button>
+		<ImageButton android:id="@+id/f_speak" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:background="@drawable/speak" 
+			android:layout_weight="1"></ImageButton>
 		<Button android:id="@+id/unfollow" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:layout_weight="1"
 			android:text="@string/unfollow"></Button>
-		<Button android:id="@+id/cancel_button" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:layout_weight="1"
-			android:text="@string/cancel"></Button>
 	</LinearLayout>
-
 </LinearLayout>

@@ -31,7 +31,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
 import com.vti.services.managers.FeedManager;
-import com.vti.services.managers.OAuthAuthenticatonMgr;
+import com.vti.services.managers.AccountManager;
 
 public class SplashScreen extends Activity {
 	
@@ -41,7 +41,7 @@ public class SplashScreen extends Activity {
 	private RequestToken requestToken;
 	
 	private ImageButton twitterButton;
-	private OAuthAuthenticatonMgr authMgr = null;
+	private AccountManager authMgr = null;
 
 		
 
@@ -60,7 +60,7 @@ public class SplashScreen extends Activity {
 			createAuthorizationRequests(twitterButton);
 			
 			
-			authMgr = new OAuthAuthenticatonMgr(getApplicationContext());
+			authMgr = new AccountManager(getApplicationContext());
 			//FIXME - This is not the right place to set the alarm. We should have a broad cast receiver which listens for Phone Boot Event.
 			// When the phone boots we should set the alarm manager.
 			//FIXME - In the same broadcast receiver we should register our broadcast receiver to listen to battery levels and register another 
@@ -120,8 +120,7 @@ public class SplashScreen extends Activity {
 				String authUrl = null;
 				try {
 					twitter = new TwitterFactory().getInstance();
-					twitter.setOAuthConsumer(Constants.CONSUMER_KEY,
-							Constants.CONSUMER_SECRET);
+					twitter.setOAuthConsumer(Constants.CONSUMER_KEY,Constants.CONSUMER_SECRET);
 					
 					requestToken=twitter.getOAuthRequestToken(Constants.CALLBACK_URL);
 					System.err.println("twitterUrl=="+requestToken.getAuthorizationURL());
@@ -193,8 +192,7 @@ public class SplashScreen extends Activity {
 			
 			AccessToken accessToken = twitter.getOAuthAccessToken(
 					requestToken, verifier);
-					
-
+	
 			Log.e(TAG, "Access token: " + accessToken.getToken());
 			Log.e(TAG, "Token secret: " + accessToken.getTokenSecret());
 			

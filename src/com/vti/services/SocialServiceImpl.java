@@ -33,7 +33,7 @@ import com.vti.SocialFeed;
 import com.vti.db.DBAdapter;
 import com.vti.model.Twit;
 import com.vti.services.managers.FeedManager;
-import com.vti.services.managers.OAuthAuthenticatonMgr;
+import com.vti.services.managers.AccountManager;
 
 public class SocialServiceImpl extends Service {
 	private static final String TAG = SocialServiceImpl.class.getSimpleName();
@@ -44,7 +44,7 @@ public class SocialServiceImpl extends Service {
 		public List<Twit> getFromServer() throws RemoteException {
 			final FeedManager feedManager = new FeedManager(
 					getApplicationContext());
-			final OAuthAuthenticatonMgr authMgr = new OAuthAuthenticatonMgr(
+			final AccountManager authMgr = new AccountManager(
 					getApplicationContext());
 			if (!authMgr.isAuthTokenEmpty()) {
 				final List<Twit> twits = feedManager.getSocialFeed();
@@ -156,7 +156,7 @@ public class SocialServiceImpl extends Service {
 				boolean sendNotification = false;
 				final FeedManager feedManager = new FeedManager(
 						getApplicationContext());
-				final OAuthAuthenticatonMgr authMgr = new OAuthAuthenticatonMgr(
+				final AccountManager authMgr = new AccountManager(
 						getApplicationContext());
 				if (!authMgr.isAuthTokenEmpty()) {
 					final List<Twit> twits = feedManager.getSocialFeed();

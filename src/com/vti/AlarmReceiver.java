@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Saurabh Gangarde & Rohit Ghatol (http://code.google.com/p/droidtwit/)
+ * Copyright 2011 Sol Ma
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import android.os.RemoteException;
 import com.vti.services.ISocialService;
 import com.vti.model.OAuthTokens;
 import com.vti.services.SocialServiceImpl;
-import com.vti.services.managers.OAuthAuthenticatonMgr;
+import com.vti.services.managers.AccountManager;
 
 /**
  * @author rohit

@@ -30,20 +30,21 @@ import com.vti.Constants;
 import com.vti.SplashScreen;
 import com.vti.model.OAuthTokens;
 import com.vti.model.Twit;
-import com.vti.services.managers.OAuthAuthenticatonMgr;
+import com.vti.services.managers.AccountManager;
 
 public class FeedManager {
 	private static final String TAG = FeedManager.class.getSimpleName();
-	Context context;
-	OAuthAuthenticatonMgr authMgr;
 	TwitterFactory tf;
+	Context context;
+	AccountManager authMgr;
+	
 
 	/**
 	 * 
 	 */
 	public FeedManager(final Context context) {
 		this.context = context;
-		authMgr = new OAuthAuthenticatonMgr(context);
+		authMgr = new AccountManager(context);
 		if (!authMgr.isAuthTokenEmpty()) {
 			tf = new TwitterFactory(new ConfigurationBuilder()
 					.setDebugEnabled(true)
@@ -58,7 +59,7 @@ public class FeedManager {
 		}
 	}
 
-	public OAuthAuthenticatonMgr getOAuthMgr() {
+	public AccountManager getOAuthMgr() {
 		return authMgr;
 	}
 
@@ -90,7 +91,8 @@ public class FeedManager {
 		final SharedPreferences settings = context.getSharedPreferences(
 				Constants.SETTING_VALUES, Context.MODE_PRIVATE);
 		final Editor editor = settings.edit();
-		editor.putLong(Constants.REFRESH_INTERVAL, interval * Constants.ONE_MINUTE);
+		editor.putLong(Constants.REFRESH_INTERVAL, interval
+				* Constants.ONE_MINUTE);
 		editor.commit();
 	}
 
@@ -108,14 +110,14 @@ public class FeedManager {
 			twits = new ArrayList<Twit>(statues.size());
 
 			for (Status status : statues) {
-				// twits.add(new Twit(status.getId().longValue(),
-				// user.getName(), user.getProfileImageUrl().toString(),
-				// twitText));
-				Log.d(FeedManager.class.getSimpleName(), status.getUser()
-						.getName() + "  " + status.getText());
-				twits.add(new Twit(status.getId(), status.getUser().getName(),
-						status.getUser().getProfileImageURL().toString(),
-						status.getText()));
+				// only return tweets from VTI accounts
+				if (status.getUser().getName().startsWith("vti_")) {
+					Log.d(FeedManager.class.getSimpleName(), status.getUser()
+							.getName() + "  " + status.getText());
+					twits.add(new Twit(status.getId(), status.getUser()
+							.getName(), status.getUser().getProfileImageURL()
+							.toString(), status.getText()));
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -23,7 +23,7 @@ import android.content.SharedPreferences.Editor;
  * @author rohit
  * 
  */
-public class OAuthAuthenticatonMgr {
+public class AccountManager {
 	private static final String AUTHORIZATIONS = "OAuthAccessTokens";
 	private static final String ACCESS_TOKEN = "AccessToken";
 	private static final String TOKEN_SECRET = "TokenSecret";
@@ -31,7 +31,7 @@ public class OAuthAuthenticatonMgr {
 	private Context context = null;
 	
 
-	public OAuthAuthenticatonMgr(Context context) {
+	public AccountManager(Context context) {
 		this.context = context;
 	}
 
@@ -46,7 +46,6 @@ public class OAuthAuthenticatonMgr {
 		boolean result = true;
 		String accessToken = settings.getString(ACCESS_TOKEN, null);
 		String tokenSecret = settings.getString(TOKEN_SECRET, null);
-
 		if (null != accessToken && null != tokenSecret) {
 			result = false;
 		}
@@ -60,7 +59,6 @@ public class OAuthAuthenticatonMgr {
 	public OAuthTokens getAuthTokens() {
 		final SharedPreferences settings = context.getSharedPreferences(
 				AUTHORIZATIONS, 0);
-
 		String accessToken = settings.getString(ACCESS_TOKEN, null);
 		String tokenSecret = settings.getString(TOKEN_SECRET, null);
 		if (null != accessToken && null != tokenSecret) {

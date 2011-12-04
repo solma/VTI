@@ -12,6 +12,7 @@
  */
 package com.vti;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlarmManager;
@@ -28,12 +29,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -47,12 +50,14 @@ import com.vti.model.OAuthTokens;
 import com.vti.model.Twit;
 import com.vti.services.SocialServiceImpl;
 import com.vti.services.managers.FeedManager;
-import com.vti.services.managers.OAuthAuthenticatonMgr;
+import com.vti.services.managers.AccountManager;
 
 public class SocialFeed extends ListActivity {
 	private static final String TAG = SocialFeed.class.getSimpleName();
-
-	private OAuthAuthenticatonMgr authMgr;
+	
+	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
+	
+	private AccountManager authMgr;
 	private ISocialService socialService;
 	private ImageButton refreshButton;
 
@@ -169,7 +174,7 @@ public class SocialFeed extends ListActivity {
 		protected Void doInBackground(final String... params) {
 			final FeedManager feedManager = new FeedManager(
 					getApplicationContext());
-			final OAuthAuthenticatonMgr authMgr = feedManager.getOAuthMgr();
+			final AccountManager authMgr = feedManager.getOAuthMgr();
 			if (!authMgr.isAuthTokenEmpty()) {
 				feedManager.tweet(params[0]);
 			}
@@ -190,7 +195,7 @@ public class SocialFeed extends ListActivity {
 		protected Void doInBackground(final String... params) {
 			final FeedManager feedManager = new FeedManager(
 					getApplicationContext());
-			final OAuthAuthenticatonMgr authMgr = feedManager.getOAuthMgr();
+			final AccountManager authMgr = feedManager.getOAuthMgr();
 			if (!authMgr.isAuthTokenEmpty()) {
 				feedManager.follow(params[0]);
 			}
@@ -211,7 +216,7 @@ public class SocialFeed extends ListActivity {
 		protected Void doInBackground(final String... params) {
 			final FeedManager feedManager = new FeedManager(
 					getApplicationContext());
-			final OAuthAuthenticatonMgr authMgr = feedManager.getOAuthMgr();
+			final AccountManager authMgr = feedManager.getOAuthMgr();
 			if (!authMgr.isAuthTokenEmpty()) {
 				feedManager.unfollow(params[0]);
 			}
@@ -264,7 +269,7 @@ public class SocialFeed extends ListActivity {
 			setContentView(R.layout.feed_list);
 			refreshButton = (ImageButton) findViewById(R.id.force_refresh);
 
-			authMgr = new OAuthAuthenticatonMgr(getApplicationContext());
+			authMgr = new AccountManager(getApplicationContext());
 			final OAuthTokens oAuthTokens = authMgr.getAuthTokens();
 
 			if (null != oAuthTokens) {
@@ -312,10 +317,12 @@ public class SocialFeed extends ListActivity {
 		case R.id.publish:
 			handlePublish();
 			return true;
-		case R.id.about_us:
-			handleAboutUs();
 		case R.id.follow_unfollow:
 			handleFollowUnfollow();
+			return true;
+		case R.id.about_us:
+			handleAboutUs();
+			return true;
 		default:
 			return false;
 		}
@@ -331,8 +338,6 @@ public class SocialFeed extends ListActivity {
 
 		final Button followButton = (Button) dialog.findViewById(R.id.follow);
 		final Button unfollowButton = (Button) dialog.findViewById(R.id.unfollow);
-		final Button cancelButton = (Button) dialog
-				.findViewById(R.id.cancel_button);
 		final EditText edittext = (EditText) dialog
 				.findViewById(R.id.tweet_text);
 
@@ -354,13 +359,6 @@ public class SocialFeed extends ListActivity {
 			}
 		});
 	
-		cancelButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				dialog.cancel();
-			}
-		});
-
 		dialog.show();
 	}
 
@@ -381,18 +379,18 @@ public class SocialFeed extends ListActivity {
 		dialog.setTitle(R.string.publish);
 		dialog.setContentView(R.layout.publish);
 
-		final Button tweetButton = (Button) dialog.findViewById(R.id.tweet);
-		final Button cancelButton = (Button) dialog
-				.findViewById(R.id.cancel_button);
-		final EditText tweetText = (EditText) dialog
-				.findViewById(R.id.tweet_text);
+		final Button publishButton = (Button) dialog.findViewById(R.id.publish);
+		final Button cancelButton = (Button) dialog.findViewById(R.id.cancel_button);
+		final EditText tweetText = (EditText) dialog.findViewById(R.id.publish_text);
+		final ImageButton speakButton= (ImageButton) dialog.findViewById(R.id.speak);
 
-		tweetButton.setOnClickListener(new OnClickListener() {
+		publishButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				dialog.cancel();
 				TweetAsyncTask tweetAsyncTask = new TweetAsyncTask();
-				tweetAsyncTask.execute(tweetText.getText().toString());
+				//always add "@VTI " to the beginning of the tweet
+				tweetAsyncTask.execute("@vti_robot "+tweetText.getText().toString());
 			}
 		});
 		
@@ -402,9 +400,37 @@ public class SocialFeed extends ListActivity {
 				dialog.cancel();
 			}
 		});
+		
+		speakButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+		        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+		                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+		        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speech recognition demo");
+		        //TODO: fix me, how to start a speech input
+		        //startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+		   	}
+		});
 
 		dialog.show();
 	}
+	
+    /**
+     * Handle the results from the speech recognition activity.
+     */
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
+            // Fill the list view with the strings the recognizer thought it could have heard
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            //TODO: how to show the matched result back to a edittext
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+	
 
 	/**
 	 * Handle Setting click

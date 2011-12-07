@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="lib/jtwitter.jar"/>
 	<classpathentry kind="lib" path="lib/signpost-core-1.2.jar"/>
 	<classpathentry kind="lib" path="E:/eclipse/workspace/VTI/lib/twitter4j-core-2.2.5.jar" sourcepath="lib/twitter4j-core-2.2.5-sources.jar">
 		<attributes>
@@ -11,5 +10,10 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="lib/jsoup-1.6.1.jar" sourcepath="lib/jsoup-1.6.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/VTI/lib/jsoup-1.6.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -13,20 +13,11 @@
  */
 package com.vti;
 
-import java.util.Date;
-
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.os.RemoteException;
 
-import com.vti.services.ISocialService;
-import com.vti.model.OAuthTokens;
 import com.vti.services.SocialServiceImpl;
-import com.vti.services.managers.AccountManager;
 
 /**
  * @author rohit

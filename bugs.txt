@@ -1,0 +1,4 @@
+1. twitter.getOAuthRequestToken(Constants.CALLBACK_URL) returns errors 
+after the removal of an old account and then try to login again.
+Now have to recreate a new virtual device to run the application. 
+

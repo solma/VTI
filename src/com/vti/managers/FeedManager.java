@@ -10,31 +10,27 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package com.vti.services.managers;
+package com.vti.managers;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import twitter4j.GeoLocation;
 import twitter4j.Status;
+import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.User;
-import twitter4j.conf.ConfigurationBuilder;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.vti.Constants;
-import com.vti.SplashScreen;
-import com.vti.model.OAuthTokens;
 import com.vti.model.Twit;
-import com.vti.services.managers.AccountManager;
 
 public class FeedManager {
 	private static final String TAG = FeedManager.class.getSimpleName();
-	TwitterFactory tf;
+	Twitter twitter;
 	Context context;
 	AccountManager authMgr;
 	
@@ -45,26 +41,12 @@ public class FeedManager {
 	public FeedManager(final Context context) {
 		this.context = context;
 		authMgr = new AccountManager(context);
-		if (!authMgr.isAuthTokenEmpty()) {
-			tf = new TwitterFactory(new ConfigurationBuilder()
-					.setDebugEnabled(true)
-					.setOAuthConsumerKey(Constants.CONSUMER_KEY)
-					.setOAuthConsumerSecret(Constants.CONSUMER_SECRET)
-					.setOAuthAccessToken(
-							authMgr.getAuthTokens().getAccessToken())
-					.setOAuthAccessTokenSecret(
-							authMgr.getAuthTokens().getAccessSecret()).build());
-			Log.d(TAG, authMgr.getAuthTokens().getAccessToken() + "  "
-					+ authMgr.getAuthTokens().getAccessSecret());
-		}
+		if(!authMgr.isAccountEmpty())
+			twitter=authMgr.getTwitterFactory().getInstance();
 	}
 
 	public AccountManager getOAuthMgr() {
 		return authMgr;
-	}
-
-	public TwitterFactory getTwitterFactory() {
-		return tf;
 	}
 
 	/**
@@ -104,7 +86,6 @@ public class FeedManager {
 	public List<Twit> getSocialFeed() {
 		List<Twit> twits = null;
 		try {
-			Twitter twitter = tf.getInstance();
 			// User user = twitter.verifyCredentials();
 			final List<Status> statues = twitter.getHomeTimeline();
 			twits = new ArrayList<Twit>(statues.size());
@@ -127,14 +108,15 @@ public class FeedManager {
 	}
 
 	/**
-	 * set status on twitter
+	 * publish status to account vti_robot on twitter
 	 * 
 	 * @param tweet
 	 */
-	public void tweet(final String tweet) {
-		Twitter twitter = tf.getInstance();
+	public void tweet(final String tweet, GeoLocation loc) {
 		try {
-			twitter.updateStatus(tweet);
+			StatusUpdate status=new StatusUpdate(tweet);
+			status.setLocation(loc);
+			twitter.updateStatus(status);
 		} catch (TwitterException e) {
 			e.printStackTrace();
 		}
@@ -146,7 +128,6 @@ public class FeedManager {
 	 * @param accounts
 	 */
 	public void follow(final String accounts) {
-		Twitter twitter = tf.getInstance();
 		try {
 			String[] ats = accounts.split(";");
 			for (String s : ats)
@@ -163,7 +144,6 @@ public class FeedManager {
 	 * @param accounts
 	 */
 	public void unfollow(final String accounts) {
-		Twitter twitter = tf.getInstance();
 		try {
 			String[] ats = accounts.split(";");
 			for (String s : ats)

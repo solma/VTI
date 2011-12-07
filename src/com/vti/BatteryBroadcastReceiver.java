@@ -15,7 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.vti.services.managers.FeedManager;
+import com.vti.managers.FeedManager;
 
 /**
  * Watch out for battery level and disable Twitter service, when battery level is high then start the service again

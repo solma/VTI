@@ -11,13 +11,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
  * See the License for the specific language governing permissions and limitations under the License.
  */
-package com.vti.services.managers;
+package com.vti.managers;
 
-import com.vti.model.OAuthTokens;
-
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.AccessToken;
+import twitter4j.conf.ConfigurationBuilder;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+
+import com.vti.Constants;
 
 /**
  * @author rohit
@@ -27,59 +32,72 @@ public class AccountManager {
 	private static final String AUTHORIZATIONS = "OAuthAccessTokens";
 	private static final String ACCESS_TOKEN = "AccessToken";
 	private static final String TOKEN_SECRET = "TokenSecret";
-	
-	private Context context = null;
-	
 
-	public AccountManager(Context context) {
-		this.context = context;
-	}
+	private TwitterFactory tf;
 
-	/**
-	 * 
-	 * @return true if OAuth token is empty, i.e. not required yet, false if application
-	 *         already has required tokens
-	 */
-	public boolean isAuthTokenEmpty() {
+	private Context context;
+
+	public AccountManager(Context ctxt) {
+		this.context = ctxt;
 		final SharedPreferences settings = context.getSharedPreferences(
 				AUTHORIZATIONS, 0);
-		boolean result = true;
 		String accessToken = settings.getString(ACCESS_TOKEN, null);
 		String tokenSecret = settings.getString(TOKEN_SECRET, null);
+
 		if (null != accessToken && null != tokenSecret) {
-			result = false;
+			tf = new TwitterFactory(new ConfigurationBuilder()
+					.setDebugEnabled(true)
+					.setOAuthConsumerKey(Constants.CONSUMER_KEY)
+					.setOAuthConsumerSecret(Constants.CONSUMER_SECRET)
+					.setOAuthAccessToken(accessToken)
+					.setOAuthAccessTokenSecret(tokenSecret).build());
 		}
-		return result;
+	}
+
+	public TwitterFactory getTwitterFactory() {
+		return tf;
 	}
 
 	/**
 	 * 
-	 * @return OAuth OAuthTokens from shared preference, if tokens not found in shared preferences returns null
+	 * @return true if OAuth token is empty, i.e. not required yet, false if
+	 *         application already has required tokens
 	 */
-	public OAuthTokens getAuthTokens() {
-		final SharedPreferences settings = context.getSharedPreferences(
-				AUTHORIZATIONS, 0);
-		String accessToken = settings.getString(ACCESS_TOKEN, null);
-		String tokenSecret = settings.getString(TOKEN_SECRET, null);
-		if (null != accessToken && null != tokenSecret) {
-			return new OAuthTokens(accessToken, tokenSecret);
-		} else {
+	public boolean isAccountEmpty() {
+		return tf == null ? true : false;
+	}
+
+	/**
+	 * 
+	 * @return OAuth OAuthTokens from save Accounts
+	 */
+	public AccessToken getAuthTokens() {
+		if (tf != null) {
+			Twitter twitter = tf.getInstance();
+			try {
+				return twitter.getOAuthAccessToken();
+			} catch (TwitterException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else
 			return null;
-		}
-
 	}
-	
+
 	/**
 	 * Save the oAuth Token for future use
+	 * 
 	 * @param accessToken
 	 * @param tokenSecret
 	 */
-	public void saveAuthTokens(String accessToken, String tokenSecret){
-		final SharedPreferences settings = context.getSharedPreferences(AUTHORIZATIONS,
-				0);
+	public void saveAccount(String accessToken, String tokenSecret) {
+		final SharedPreferences settings = context.getSharedPreferences(
+				AUTHORIZATIONS, 0);
 		Editor editor = settings.edit();
 		editor.putString(ACCESS_TOKEN, accessToken);
 		editor.putString(TOKEN_SECRET, tokenSecret);
 		editor.commit();
 	}
+
+
 }

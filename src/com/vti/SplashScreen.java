@@ -30,18 +30,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
-import com.vti.services.managers.FeedManager;
-import com.vti.services.managers.AccountManager;
+import com.vti.managers.AccountManager;
+import com.vti.managers.FeedManager;
 
 public class SplashScreen extends Activity {
 	
 	private static final String TAG = SplashScreen.class.getSimpleName() ;
 
-	private Twitter twitter=null;
+	private Twitter twitter;
 	private RequestToken requestToken;
 	
 	private ImageButton twitterButton;
-	private AccountManager authMgr = null;
+	private AccountManager accMgr;
 
 		
 
@@ -60,7 +60,7 @@ public class SplashScreen extends Activity {
 			createAuthorizationRequests(twitterButton);
 			
 			
-			authMgr = new AccountManager(getApplicationContext());
+			accMgr = new AccountManager(getApplicationContext());
 			//FIXME - This is not the right place to set the alarm. We should have a broad cast receiver which listens for Phone Boot Event.
 			// When the phone boots we should set the alarm manager.
 			//FIXME - In the same broadcast receiver we should register our broadcast receiver to listen to battery levels and register another 
@@ -68,14 +68,14 @@ public class SplashScreen extends Activity {
 			// These changes will be coming soon.......
 			//setAlarm();
 						
-			if (authMgr.isAuthTokenEmpty()) {
+			if (accMgr.isAccountEmpty()) {
 				twitterButton.setVisibility(View.VISIBLE);
 				Log.d(TAG,"not authorized yet");
 				createAuthorizationRequests(twitterButton);
 			} else {
 				twitterButton.setVisibility(View.INVISIBLE);
 				navigateToSocialFeed();
-				Log.d(TAG,authMgr.getAuthTokens().getAccessToken()+"  "+authMgr.getAuthTokens().getAccessSecret());
+				Log.d(TAG,accMgr.getAuthTokens().toString());
 			}
 		
 		
@@ -196,7 +196,7 @@ public class SplashScreen extends Activity {
 			Log.e(TAG, "Access token: " + accessToken.getToken());
 			Log.e(TAG, "Token secret: " + accessToken.getTokenSecret());
 			
-			authMgr.saveAuthTokens(accessToken.getToken(), accessToken.getTokenSecret());
+			accMgr.saveAccount(accessToken.getToken(), accessToken.getTokenSecret());
 		}
 
 	}

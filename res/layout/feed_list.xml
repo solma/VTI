@@ -7,11 +7,23 @@
 		<TextView android:id="@+id/title" android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:text="@string/notifications"
 			android:layout_alignParentLeft="true" android:textSize="28dip"
-			android:paddingLeft="10dip" android:gravity="center_vertical"></TextView>
+			android:paddingLeft="10dip" ></TextView>
 		<ImageButton android:id="@+id/force_refresh"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:layout_alignParentRight="true" android:background="@drawable/refresh_button"></ImageButton>
 	</RelativeLayout>
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		<Button android:id="@+id/publish" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:layout_weight="1"
+			android:text="@string/publish"></Button>
+		<Button android:id="@+id/follow_unfollow" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:layout_weight="1"
+			android:text="(Un)Follow"></Button>
+		<Button android:id="@+id/route" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:layout_weight="1"
+			android:text="@string/route"></Button>
+	</LinearLayout>
 	<ListView android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:id="@android:id/list"></ListView>
 </LinearLayout>

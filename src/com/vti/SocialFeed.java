@@ -15,6 +15,8 @@ package com.vti;
 import java.util.ArrayList;
 import java.util.List;
 
+import twitter4j.GeoLocation;
+import twitter4j.auth.AccessToken;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -25,6 +27,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -36,21 +39,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import com.vti.R;
-import com.vti.services.ISocialService;
 import com.vti.adapters.TwitAdapter;
-import com.vti.model.OAuthTokens;
+import com.vti.managers.AccountManager;
+import com.vti.managers.FeedManager;
+import com.vti.managers.LocManager;
 import com.vti.model.Twit;
+import com.vti.services.ISocialService;
 import com.vti.services.SocialServiceImpl;
-import com.vti.services.managers.FeedManager;
-import com.vti.services.managers.AccountManager;
 
 public class SocialFeed extends ListActivity {
 	private static final String TAG = SocialFeed.class.getSimpleName();
@@ -60,9 +61,12 @@ public class SocialFeed extends ListActivity {
 	private AccountManager authMgr;
 	private ISocialService socialService;
 	private ImageButton refreshButton;
+	private Button publishButton;
+	private Button followButton;
+	private Button routeButton;
 
 	private class FetchFromDBTask extends
-			AsyncTask<OAuthTokens, Void, List<Twit>> {
+			AsyncTask<AccessToken, Void, List<Twit>> {
 		private ProgressDialog dialog = new ProgressDialog(SocialFeed.this);
 		/*
 		 * (non-Javadoc)
@@ -77,7 +81,7 @@ public class SocialFeed extends ListActivity {
 		}
 
 		@Override
-		protected List<Twit> doInBackground(final OAuthTokens... params) {
+		protected List<Twit> doInBackground(final AccessToken... params) {
 			List<Twit> result = null;
 			if (null != socialService) {
 				try {
@@ -116,7 +120,7 @@ public class SocialFeed extends ListActivity {
 	};
 
 	private class FetchFromServer extends
-			AsyncTask<OAuthTokens, Void, List<Twit>> {
+			AsyncTask<AccessToken, Void, List<Twit>> {
 		private ProgressDialog dialog = new ProgressDialog(SocialFeed.this);
 
 		/*
@@ -132,7 +136,7 @@ public class SocialFeed extends ListActivity {
 		}
 
 		@Override
-		protected List<Twit> doInBackground(final OAuthTokens... params) {
+		protected List<Twit> doInBackground(final AccessToken... params) {
 			List<Twit> result = null;
 			if (null != socialService) {
 				try {
@@ -153,7 +157,6 @@ public class SocialFeed extends ListActivity {
 		 */
 		@Override
 		protected void onPostExecute(final List<Twit> result) {
-
 			super.onPostExecute(result);
 			if (null != result) {
 				final TwitAdapter adapter = new TwitAdapter(
@@ -175,8 +178,10 @@ public class SocialFeed extends ListActivity {
 			final FeedManager feedManager = new FeedManager(
 					getApplicationContext());
 			final AccountManager authMgr = feedManager.getOAuthMgr();
-			if (!authMgr.isAuthTokenEmpty()) {
-				feedManager.tweet(params[0]);
+			final LocManager locMgr=new LocManager(getApplicationContext());
+			Location loc=locMgr.getLatestLocation();
+			if (!authMgr.isAccountEmpty()) {
+				feedManager.tweet(params[0], new GeoLocation(loc.getLatitude(),loc.getLongitude()));
 			}
 			return null;
 		}
@@ -196,7 +201,7 @@ public class SocialFeed extends ListActivity {
 			final FeedManager feedManager = new FeedManager(
 					getApplicationContext());
 			final AccountManager authMgr = feedManager.getOAuthMgr();
-			if (!authMgr.isAuthTokenEmpty()) {
+			if (!authMgr.isAccountEmpty()) {
 				feedManager.follow(params[0]);
 			}
 			return null;
@@ -217,7 +222,7 @@ public class SocialFeed extends ListActivity {
 			final FeedManager feedManager = new FeedManager(
 					getApplicationContext());
 			final AccountManager authMgr = feedManager.getOAuthMgr();
-			if (!authMgr.isAuthTokenEmpty()) {
+			if (!authMgr.isAccountEmpty()) {
 				feedManager.unfollow(params[0]);
 			}
 			return null;
@@ -243,6 +248,7 @@ public class SocialFeed extends ListActivity {
 			// from DB
 			FetchFromDBTask fetchFromDBTask = new FetchFromDBTask();
 			fetchFromDBTask.execute(authMgr.getAuthTokens());
+
 			// Also register onclick listener for refresh button, its
 			// now safe to do so
 			refreshButton.setOnClickListener(new OnClickListener() {
@@ -268,11 +274,35 @@ public class SocialFeed extends ListActivity {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.feed_list);
 			refreshButton = (ImageButton) findViewById(R.id.force_refresh);
-
+			
+			publishButton = (Button)findViewById(R.id.publish);
+			followButton = (Button)findViewById(R.id.follow_unfollow);
+			routeButton =(Button)findViewById(R.id.route);
+			
+			publishButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					handlePublish();
+				}
+			});
+			
+			followButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					handleFollowUnfollow();
+				}
+			});
+			
+			routeButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(final View v) {
+					handleRoute();
+				}
+			});
+			
 			authMgr = new AccountManager(getApplicationContext());
-			final OAuthTokens oAuthTokens = authMgr.getAuthTokens();
-
-			if (null != oAuthTokens) {
+	
+			if (null != authMgr.getTwitterFactory()) {
 				bindService(new Intent(getApplicationContext(),
 						SocialServiceImpl.class), connection,
 						Context.BIND_AUTO_CREATE);
@@ -370,6 +400,15 @@ public class SocialFeed extends ListActivity {
 				AboutUs.class);
 		startActivity(navIntent);
 	}
+	
+	/**
+	 * handle route click
+	 */
+	private void handleRoute(){
+		final Intent navIntent = new Intent(getApplicationContext(),
+				RouteSubscription.class);
+		startActivity(navIntent);
+	}
 
 	/**
 	 * handle tweet click
@@ -450,7 +489,6 @@ public class SocialFeed extends ListActivity {
 				.findViewById(R.id.refresh_rates);
 
 		applyButton.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(final View v) {
 				if (removeAccountCheck.isChecked()) {
@@ -461,7 +499,6 @@ public class SocialFeed extends ListActivity {
 							.toString());
 				}
 				dialog.cancel();
-
 			}
 		});
 
@@ -505,7 +542,7 @@ public class SocialFeed extends ListActivity {
 	 * Remove account and access tokens associated with it
 	 */
 	private void resetAccount() {
-		authMgr.saveAuthTokens(null, null);
+		authMgr.saveAccount(null, null);
 		finish();
 		final Intent navIntent = new Intent(getApplicationContext(),
 				SplashScreen.class);

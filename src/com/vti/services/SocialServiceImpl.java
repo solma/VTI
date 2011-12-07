@@ -30,10 +30,10 @@ import android.util.Log;
 import com.vti.R;
 import com.vti.services.ISocialService;
 import com.vti.SocialFeed;
-import com.vti.db.DBAdapter;
+import com.vti.adapters.DBAdapter;
+import com.vti.managers.AccountManager;
+import com.vti.managers.FeedManager;
 import com.vti.model.Twit;
-import com.vti.services.managers.FeedManager;
-import com.vti.services.managers.AccountManager;
 
 public class SocialServiceImpl extends Service {
 	private static final String TAG = SocialServiceImpl.class.getSimpleName();
@@ -46,7 +46,7 @@ public class SocialServiceImpl extends Service {
 					getApplicationContext());
 			final AccountManager authMgr = new AccountManager(
 					getApplicationContext());
-			if (!authMgr.isAuthTokenEmpty()) {
+			if (!authMgr.isAccountEmpty()) {
 				final List<Twit> twits = feedManager.getSocialFeed();
 				final DBAdapter dbAdapter = new DBAdapter(
 						getApplicationContext());
@@ -158,7 +158,7 @@ public class SocialServiceImpl extends Service {
 						getApplicationContext());
 				final AccountManager authMgr = new AccountManager(
 						getApplicationContext());
-				if (!authMgr.isAuthTokenEmpty()) {
+				if (!authMgr.isAccountEmpty()) {
 					final List<Twit> twits = feedManager.getSocialFeed();
 					final DBAdapter dbAdapter = new DBAdapter(
 							getApplicationContext());

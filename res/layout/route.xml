@@ -8,6 +8,20 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
+        
+         <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <ImageButton
+                android:id="@+id/switchtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@drawable/switchtext" >
+            </ImageButton>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -41,6 +55,7 @@
                 android:id="@+id/from_text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:layout_weight="1" >
             </EditText>
 
@@ -48,23 +63,32 @@
                 android:id="@+id/to_text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:layout_weight="1" >
             </EditText>
         </LinearLayout>
-
-        <RelativeLayout
+        
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <ImageButton
-                android:id="@+id/switchtext"
-                android:layout_width="wrap_content"
+            <Spinner
+                android:id="@+id/from"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:background="@drawable/switchtext" >
-            </ImageButton>
-        </RelativeLayout>
+                android:layout_weight="1">
+            </Spinner>
+
+            <Spinner
+                android:id="@+id/to"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </Spinner>
+        </LinearLayout>
+
+       
     </LinearLayout>
 
     <LinearLayout
@@ -77,20 +101,20 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <Button
-                android:id="@+id/direction"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/direction" >
-            </Button>
-
-            <Button
+           <Button
                 android:id="@+id/subscribe"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/subscribe" >
+            </Button>
+            
+            <Button
+                android:id="@+id/unsubscribe"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/unsubscribe" >
             </Button>
         </LinearLayout>
 

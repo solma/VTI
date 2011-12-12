@@ -12,6 +12,15 @@
  */
 package com.vti;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,10 +53,11 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.vti.adapters.TwitAdapter;
 import com.vti.managers.AccountManager;
-import com.vti.managers.FeedManager;
+import com.vti.managers.TwitterManager;
 import com.vti.managers.LocManager;
 import com.vti.model.Twit;
 import com.vti.services.ISocialService;
@@ -175,11 +185,12 @@ public class SocialFeed extends ListActivity {
 	private class TweetAsyncTask extends AsyncTask<String, Void, Void> {
 		@Override
 		protected Void doInBackground(final String... params) {
-			final FeedManager feedManager = new FeedManager(
+			final TwitterManager feedManager = new TwitterManager(
 					getApplicationContext());
 			final AccountManager authMgr = feedManager.getOAuthMgr();
 			final LocManager locMgr=new LocManager(getApplicationContext());
 			Location loc=locMgr.getLatestLocation();
+			//TODO: check if the location is embeded
 			if (!authMgr.isAccountEmpty()) {
 				feedManager.tweet(params[0], new GeoLocation(loc.getLatitude(),loc.getLongitude()));
 			}
@@ -198,7 +209,7 @@ public class SocialFeed extends ListActivity {
 	private class FollowAsyncTask extends AsyncTask<String, Void, Void> {
 		@Override
 		protected Void doInBackground(final String... params) {
-			final FeedManager feedManager = new FeedManager(
+			final TwitterManager feedManager = new TwitterManager(
 					getApplicationContext());
 			final AccountManager authMgr = feedManager.getOAuthMgr();
 			if (!authMgr.isAccountEmpty()) {
@@ -219,7 +230,7 @@ public class SocialFeed extends ListActivity {
 	private class UnFollowAsyncTask extends AsyncTask<String, Void, Void> {
 		@Override
 		protected Void doInBackground(final String... params) {
-			final FeedManager feedManager = new FeedManager(
+			final TwitterManager feedManager = new TwitterManager(
 					getApplicationContext());
 			final AccountManager authMgr = feedManager.getOAuthMgr();
 			if (!authMgr.isAccountEmpty()) {
@@ -334,7 +345,7 @@ public class SocialFeed extends ListActivity {
 		inflater.inflate(R.menu.menu, menu);
 		return true;
 	}
-
+	
 	/**
 	 * Handle menu items
 	 */
@@ -344,11 +355,11 @@ public class SocialFeed extends ListActivity {
 		case R.id.settings:
 			handleSettings();
 			return true;
-		case R.id.publish:
-			handlePublish();
+		case R.id.feedback:
+			handleFeedback();
 			return true;
-		case R.id.follow_unfollow:
-			handleFollowUnfollow();
+		case R.id.help:
+			handleHelp();
 			return true;
 		case R.id.about_us:
 			handleAboutUs();
@@ -396,8 +407,15 @@ public class SocialFeed extends ListActivity {
 	 * handle about us click
 	 */
 	private void handleAboutUs() {
-		final Intent navIntent = new Intent(getApplicationContext(),
-				AboutUs.class);
+		final Intent navIntent = new Intent(getApplicationContext(),AboutUs.class);
+		startActivity(navIntent);
+	}
+	
+	/**
+	 * handle help click
+	 */
+	private void handleHelp() {
+		final Intent navIntent = new Intent(getApplicationContext(),Help.class);
 		startActivity(navIntent);
 	}
 	
@@ -405,8 +423,7 @@ public class SocialFeed extends ListActivity {
 	 * handle route click
 	 */
 	private void handleRoute(){
-		final Intent navIntent = new Intent(getApplicationContext(),
-				RouteSubscription.class);
+		final Intent navIntent = new Intent(getApplicationContext(), RouteSubscription.class);
 		startActivity(navIntent);
 	}
 
@@ -452,6 +469,70 @@ public class SocialFeed extends ListActivity {
 		   	}
 		});
 
+		dialog.show();
+	}
+	
+	/**
+	 * handle feedback click
+	 */
+	private void handleFeedback() {
+		final Dialog dialog = new Dialog(this);
+		dialog.setTitle("Thansk for your feedback.");
+		dialog.setContentView(R.layout.feed_back);
+
+		final Button feedbackButton = (Button) dialog.findViewById(R.id.sendFeedback);
+		final Button cancelButton = (Button) dialog.findViewById(R.id.cancel_button);
+		final EditText feedbackText = (EditText) dialog.findViewById(R.id.feedback_text);
+		
+		feedbackButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				dialog.cancel();
+				InetAddress addr = null;
+				SocketAddress sockaddr = null;
+				PrintWriter out = null;
+				BufferedReader in = null;
+				Socket clientSocket = new Socket();
+	
+				try {
+					addr = InetAddress.getByName(Constants.SERVER_IP);
+					sockaddr = new InetSocketAddress(addr,
+							Constants.SERVER_PORT);
+				} catch (UnknownHostException e) {
+					Log.e(TAG, "Unknow Host Exception: cannot resolve "+ Constants.SERVER_IP);
+					return;
+				}
+				// set connection time out
+				try {
+					clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
+				} catch (IOException e) {
+					Log.e(TAG, "Time out when connect to server");
+					Toast.makeText(getApplicationContext(),"Cannot connect to the server.", Toast.LENGTH_SHORT).show();
+					return;
+				}
+				try {
+					out = new PrintWriter(clientSocket.getOutputStream(), true);
+
+					in = new BufferedReader(new InputStreamReader(clientSocket
+							.getInputStream()));
+					Log.e(TAG, "After readLine.");
+					out.print("Feedback\n" + feedbackText.getText().toString());
+					out.close();
+					clientSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		
+		cancelButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				dialog.cancel();
+			}
+		});
+		
 		dialog.show();
 	}
 	
@@ -523,7 +604,7 @@ public class SocialFeed extends ListActivity {
 	private void updateFeedRefreshInterval(final String selectedItem) {
 		final int interval = Integer.valueOf(selectedItem);
 
-		final FeedManager feedManager = new FeedManager(getApplicationContext());
+		final TwitterManager feedManager = new TwitterManager(getApplicationContext());
 		feedManager.setTwitterFeedRefreshInterval(interval);
 
 		// Update alarm manager in current running application instance

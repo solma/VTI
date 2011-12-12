@@ -32,7 +32,7 @@ import com.vti.services.ISocialService;
 import com.vti.SocialFeed;
 import com.vti.adapters.DBAdapter;
 import com.vti.managers.AccountManager;
-import com.vti.managers.FeedManager;
+import com.vti.managers.TwitterManager;
 import com.vti.model.Twit;
 
 public class SocialServiceImpl extends Service {
@@ -42,7 +42,7 @@ public class SocialServiceImpl extends Service {
 
 		// FIXME - Need more optimum logic, but this will do for the demo
 		public List<Twit> getFromServer() throws RemoteException {
-			final FeedManager feedManager = new FeedManager(
+			final TwitterManager feedManager = new TwitterManager(
 					getApplicationContext());
 			final AccountManager authMgr = new AccountManager(
 					getApplicationContext());
@@ -154,7 +154,7 @@ public class SocialServiceImpl extends Service {
 			@Override
 			public void run() {
 				boolean sendNotification = false;
-				final FeedManager feedManager = new FeedManager(
+				final TwitterManager feedManager = new TwitterManager(
 						getApplicationContext());
 				final AccountManager authMgr = new AccountManager(
 						getApplicationContext());

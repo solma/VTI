@@ -15,7 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.vti.managers.FeedManager;
+import com.vti.managers.TwitterManager;
 
 /**
  * Watch out for battery level and disable Twitter service, when battery level is high then start the service again
@@ -57,7 +57,7 @@ public class BatteryBroadcastReceiver extends BroadcastReceiver
 		final Intent intent = new Intent(context, AlarmReceiver.class);
 		final PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 100, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
-		final FeedManager feedManager = new FeedManager(context);
+		final TwitterManager feedManager = new TwitterManager(context);
 		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (5000), feedManager
 				.getTwitterFeedRefreshInterval(), pendingIntent);
 

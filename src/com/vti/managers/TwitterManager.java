@@ -28,8 +28,8 @@ import android.util.Log;
 import com.vti.Constants;
 import com.vti.model.Twit;
 
-public class FeedManager {
-	private static final String TAG = FeedManager.class.getSimpleName();
+public class TwitterManager {
+	private static final String TAG = TwitterManager.class.getSimpleName();
 	Twitter twitter;
 	Context context;
 	AccountManager authMgr;
@@ -38,7 +38,7 @@ public class FeedManager {
 	/**
 	 * 
 	 */
-	public FeedManager(final Context context) {
+	public TwitterManager(final Context context) {
 		this.context = context;
 		authMgr = new AccountManager(context);
 		if(!authMgr.isAccountEmpty())
@@ -47,6 +47,10 @@ public class FeedManager {
 
 	public AccountManager getOAuthMgr() {
 		return authMgr;
+	}
+	
+	public Twitter getTwitter(){
+		return twitter;
 	}
 
 	/**
@@ -93,7 +97,7 @@ public class FeedManager {
 			for (Status status : statues) {
 				// only return tweets from VTI accounts
 				if (status.getUser().getName().startsWith("vti_")) {
-					Log.d(FeedManager.class.getSimpleName(), status.getUser()
+					Log.d(TwitterManager.class.getSimpleName(), status.getUser()
 							.getName() + "  " + status.getText());
 					twits.add(new Twit(status.getId(), status.getUser()
 							.getName(), status.getUser().getProfileImageURL()

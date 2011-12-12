@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="@string/publish" android:enabled="true" android:id="@+id/publish" android:icon="@drawable/twitter_icon"></item>
-    <item android:title="@string/follow_unfollow" android:enabled="true" android:id="@+id/follow_unfollow" android:icon="@drawable/twitter_icon"></item>
-    <item android:title="@string/settings" android:enabled="true" android:id="@+id/settings" android:icon="@android:drawable/ic_menu_preferences"></item>
-    <item android:title="@string/about_us" android:enabled="true" android:id="@+id/about_us" android:icon="@android:drawable/ic_menu_info_details"></item>
-    
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/settings"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/settings">
+    </item>
+
+    <item
+        android:id="@+id/help"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="@string/help">
+    </item>
+
+    <item
+        android:id="@+id/feedback"
+        android:enabled="true"
+        android:icon="@drawable/feedback"
+        android:title="@string/feedback">
+    </item>
+
+    <item
+        android:id="@+id/about_us"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/about_us">
+    </item>
+
 </menu>

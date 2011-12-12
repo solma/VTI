@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+>
+
+	<TextView android:id="@+id/transitRouteDetail" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:textSize="20dip"
+			android:text="Are you sure to select this route?"
+	></TextView>
+
+	<Button
+	    android:id="@+id/yes"
+	    android:layout_width="100dp"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@+id/transitRouteDetail"
+	    android:text="Yes" />
+	
+	<Button
+	    android:id="@+id/no"
+	    android:layout_width="100dp"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_below="@+id/transitRouteDetail"
+	    android:text="No" />
+
+</RelativeLayout>

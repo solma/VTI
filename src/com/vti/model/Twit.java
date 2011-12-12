@@ -28,6 +28,8 @@ public class Twit implements Parcelable {
 	private String twitMessage;
 	private long upThumbs;
 	private long downThumbs;
+	private boolean alreadyVotedUp;
+	private boolean alreadyVotedDown;
 
 
 	public static final Parcelable.Creator<Twit> CREATOR = new Parcelable.Creator<Twit>() {
@@ -57,7 +59,27 @@ public class Twit implements Parcelable {
 		this.twitMessage = twitMessage;
 		this.upThumbs=0;
 		this.downThumbs=0;
+		this.alreadyVotedUp=false;
+		this.alreadyVotedDown=false;
 	}
+	
+	
+	public boolean getAlreadyVotedUp(){
+		return alreadyVotedUp;
+	}
+	
+	public boolean getAlreadyVotedDown(){
+		return alreadyVotedDown;
+	}
+	
+	public void setAlreadyVotedUp(){
+		alreadyVotedUp=true;
+	}
+	
+	public void setAlreadyVotedDown(){
+		alreadyVotedDown=true;
+	}
+	
 	
 	public void increaseUpThumbs(){
 		upThumbs++;
@@ -116,6 +138,8 @@ public class Twit implements Parcelable {
 		out.writeString(twitMessage);
 		out.writeLong(upThumbs);
 		out.writeLong(downThumbs);
+		out.writeInt(alreadyVotedUp==true?1:0);
+		out.writeInt(alreadyVotedDown==true?1:0);
 	}
 
 	public void readFromParcel(Parcel in) {
@@ -125,6 +149,8 @@ public class Twit implements Parcelable {
 		this.profileName = in.readString();
 		this.upThumbs=in.readLong();
 		this.downThumbs=in.readLong();
+		this.alreadyVotedUp=(in.readInt()==1?true:false);
+		this.alreadyVotedDown=(in.readInt()==1?true:false);
 	}
 
 	public int describeContents() {

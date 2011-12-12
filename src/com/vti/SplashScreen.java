@@ -31,7 +31,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
 import com.vti.managers.AccountManager;
-import com.vti.managers.FeedManager;
+import com.vti.managers.TwitterManager;
 
 public class SplashScreen extends Activity {
 	
@@ -101,7 +101,7 @@ public class SplashScreen extends Activity {
 				AlarmReceiver.class);
 		final PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
 				100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		final FeedManager feedManager = new FeedManager(getApplicationContext());
+		final TwitterManager feedManager = new TwitterManager(getApplicationContext());
 		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
 				System.currentTimeMillis() + (5000),
 				feedManager.getTwitterFeedRefreshInterval(), pendingIntent);

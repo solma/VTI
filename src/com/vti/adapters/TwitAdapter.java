@@ -45,7 +45,7 @@ import com.vti.Constants;
 import com.vti.R;
 import com.vti.managers.AccountManager;
 import com.vti.managers.DrawableManager;
-import com.vti.managers.FeedManager;
+import com.vti.managers.TwitterManager;
 import com.vti.model.Twit;
 
 /**
@@ -138,45 +138,50 @@ public class TwitAdapter extends BaseAdapter {
 				PrintWriter out = null;
 				BufferedReader in = null;
 				Socket clientSocket = new Socket();
+				if(twit.getAlreadyVotedUp())
+					Toast.makeText(context, "Already voted up once!",Toast.LENGTH_SHORT );
+				else{
+					try {
+						addr = InetAddress.getByName(Constants.SERVER_IP);
+						sockaddr = new InetSocketAddress(addr,
+								Constants.SERVER_PORT);
+					} catch (UnknownHostException e) {
+						Log.e(TAG, "Unknow Host Exception: cannot resolve "
+								+ Constants.SERVER_IP);
+						return;
+					}
+					// set connection time out
+					try {
+						clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
+					} catch (IOException e) {
+						Log.e(TAG, "Time out when connect to server");
+						Toast.makeText(context, Constants.VOTE_ERROR,
+								Toast.LENGTH_SHORT).show();
+						return;
+					}
+					try {
+						out = new PrintWriter(clientSocket.getOutputStream(),
+								true);
 
-				try {
-					addr = InetAddress.getByName(Constants.SERVER_IP);
-					sockaddr = new InetSocketAddress(addr,
-							Constants.SERVER_PORT);
-				} catch (UnknownHostException e) {
-					Log.e(TAG, "Unknow Host Exception: cannot resolve "
-							+ Constants.SERVER_IP);
-					return;
-				}
-				// set connection time out
-				try {
-					clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
-				} catch (IOException e) {
-					Log.e(TAG, "Time out when connect to server");
-					Toast.makeText(context, Constants.VOTE_ERROR,
-							Toast.LENGTH_SHORT).show();
-					return;
-				}
-				try {
-					out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-					in = new BufferedReader(new InputStreamReader(clientSocket
-							.getInputStream()));
-					/**
-					 * Integer timeout in milliseconds for blocking accept or
-					 * read/receive operations (but not write/send operations).
-					 * A timeout of 0 means no timeout.
-					 */
-					while (in.readLine() != null)
-						;
-					Log.e(TAG, "After readLine.");
-					out.print(twit.getTwitId()+","+voterName+",up");
-					out.close();
-					clientSocket.close();
-					twit.increaseUpThumbs();
-					upThumbs.setText(String.valueOf(twit.getUpThumbs()));
-				} catch (IOException e) {
-					e.printStackTrace();
+						in = new BufferedReader(new InputStreamReader(
+								clientSocket.getInputStream()));
+						/**
+						 * Integer timeout in milliseconds for blocking accept
+						 * or read/receive operations (but not write/send
+						 * operations). A timeout of 0 means no timeout.
+						 */
+						while (in.readLine() != null)
+							;
+						Log.e(TAG, "After readLine.");
+						out.print(twit.getTwitId() + "," + voterName + ",up");
+						out.close();
+						clientSocket.close();
+						twit.increaseUpThumbs();
+						upThumbs.setText(String.valueOf(twit.getUpThumbs()));
+						twit.setAlreadyVotedUp();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -189,45 +194,50 @@ public class TwitAdapter extends BaseAdapter {
 				PrintWriter out = null;
 				BufferedReader in = null;
 				Socket clientSocket = new Socket();
+				if(twit.getAlreadyVotedDown())
+					Toast.makeText(context, "Already voted down once!",Toast.LENGTH_SHORT );
+				else{
+					try {
+						addr = InetAddress.getByName(Constants.SERVER_IP);
+						sockaddr = new InetSocketAddress(addr,
+								Constants.SERVER_PORT);
+					} catch (UnknownHostException e) {
+						Log.e(TAG, "Unknow Host Exception: cannot resolve "
+								+ Constants.SERVER_IP);
+						return;
+					}
+					// set connection time out
+					try {
+						clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
+					} catch (IOException e) {
+						Log.e(TAG, "Time out when connect to server");
+						Toast.makeText(context, Constants.VOTE_ERROR,
+								Toast.LENGTH_SHORT).show();
+						return;
+					}
+					try {
+						out = new PrintWriter(clientSocket.getOutputStream(),
+								true);
 
-				try {
-					addr = InetAddress.getByName(Constants.SERVER_IP);
-					sockaddr = new InetSocketAddress(addr,
-							Constants.SERVER_PORT);
-				} catch (UnknownHostException e) {
-					Log.e(TAG, "Unknow Host Exception: cannot resolve "
-							+ Constants.SERVER_IP);
-					return;
-				}
-				// set connection time out
-				try {
-					clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
-				} catch (IOException e) {
-					Log.e(TAG, "Time out when connect to server");
-					Toast.makeText(context, Constants.VOTE_ERROR,
-							Toast.LENGTH_SHORT).show();
-					return;
-				}
-				try {
-					out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-					in = new BufferedReader(new InputStreamReader(clientSocket
-							.getInputStream()));
-					/**
-					 * Integer timeout in milliseconds for blocking accept or
-					 * read/receive operations (but not write/send operations).
-					 * A timeout of 0 means no timeout.
-					 */
-					while (in.readLine() != null)
-						;
-					Log.e(TAG, "After readLine.");
-					out.print(twit.getTwitId()+","+voterName+",down");
-					out.close();
-					clientSocket.close();
-					twit.increaseDownThumbs();
-					downThumbs.setText(String.valueOf(twit.getDownThumbs()));
-				} catch (IOException e) {
-					e.printStackTrace();
+						in = new BufferedReader(new InputStreamReader(
+								clientSocket.getInputStream()));
+						/**
+						 * Integer timeout in milliseconds for blocking accept
+						 * or read/receive operations (but not write/send
+						 * operations). A timeout of 0 means no timeout.
+						 */
+						while (in.readLine() != null)
+							;
+						Log.e(TAG, "After readLine.");
+						out.print(twit.getTwitId() + "," + voterName + ",down");
+						out.close();
+						clientSocket.close();
+						twit.increaseDownThumbs();
+						downThumbs.setText(String.valueOf(twit.getDownThumbs()));
+						twit.setAlreadyVotedDown();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});

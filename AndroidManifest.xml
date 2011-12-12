@@ -21,6 +21,7 @@
 			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 			android:screenOrientation="portrait" android:launchMode="singleTask"></activity>
 		<activity android:name=".AboutUs"></activity>
+		<activity android:name=".Help"></activity>
 		<activity android:name=".RouteSubscription"></activity>
 		<receiver android:name=".AlarmReceiver" android:enabled="true">
 		</receiver>

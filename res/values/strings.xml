@@ -26,6 +26,9 @@
 	<string name="map_api_key">08aJscbbtIL1_gdkwk1rE2a03Tqi80IqWLO4nxQ</string>
 	<string name="from">From</string>
 	<string name="to">To</string>
-	<string name="direction">Show route on map</string>
+	<string name="saveroute">Save Last Subscribed Route</string>
 	<string name="subscribe">Subscribe this route</string>
+	<string name="unsubscribe">Unsubscribe last route</string>
+	<string name="feedback">FeedBack</string>
+	<string name="help">Help</string>
 </resources>

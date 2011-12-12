@@ -1,6 +1,6 @@
-package com.vti.adapters;
+package com.vti.utils;
 
-public class URLAdapter {
+public class PercentEncode {
 
     public static String encode(String input) {
         StringBuilder resultStr = new StringBuilder();

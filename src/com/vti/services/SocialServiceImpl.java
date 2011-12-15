@@ -65,7 +65,6 @@ public class SocialServiceImpl extends Service {
 							dbAdapter.insertTwit(twit.getTwitId(), twit.getProfileName(), 
 									twit.getImageUrl(),	twit.getTwitMessage(),
 									twit.getUpThumbs(), twit.getDownThumbs());
-
 						}
 					}
 				dbAdapter.close();
@@ -95,7 +94,6 @@ public class SocialServiceImpl extends Service {
 							"GetDB: " + cursor.getString(1) + " "
 									+ cursor.getString(3));
 				}
-
 				return dbTwits;
 			} finally {
 				if (null != cursor) {
@@ -132,11 +130,9 @@ public class SocialServiceImpl extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "onStartCommand");
-
 		if ((null != intent)
 				&& intent.getExtras().containsKey("ACTION")
-				&& "UPDATE_FEEDS"
-						.equals(intent.getExtras().getString("ACTION"))) {
+				&& "UPDATE_FEEDS".equals(intent.getExtras().getString("ACTION"))) {
 			try {
 				updateFeeds();
 			} catch (final RemoteException e) {
@@ -150,7 +146,6 @@ public class SocialServiceImpl extends Service {
 	private void updateFeeds() throws RemoteException {
 		Log.d(TAG, "updateFeed() called at " + (new Date()));
 		final Runnable runnable = new Runnable() {
-
 			@Override
 			public void run() {
 				boolean sendNotification = false;
@@ -178,21 +173,16 @@ public class SocialServiceImpl extends Service {
 								// Notify so that user comes to know about this
 								sendNotification = true;
 							}
-
 						}
 					if (sendNotification) {
 						sendNotification();
 					}
-
 					dbAdapter.close();
 				}
-
 			}
-
 		};
 		final Thread thread = new Thread(runnable);
 		thread.start();
-
 	}
 
 	private void sendNotification() {
@@ -202,12 +192,11 @@ public class SocialServiceImpl extends Service {
 		final CharSequence tickerText = "Twitter";
 		final long when = System.currentTimeMillis();
 
-		final Notification notification = new Notification(icon, tickerText,
-				when);
+		final Notification notification = new Notification(icon, tickerText,when);
 
 		final Context context = getApplicationContext();
-		final CharSequence contentTitle = "New Twits";
-		final CharSequence contentText = "You have new twits!";
+		final CharSequence contentTitle = "New VTI Notifications";
+		final CharSequence contentText = "You have new notificaions!";
 		final Intent notificationIntent = new Intent(getApplicationContext(),
 				SocialFeed.class);
 		notificationIntent.putExtra("Refresh", true);
@@ -216,9 +205,7 @@ public class SocialServiceImpl extends Service {
 
 		notification.setLatestEventInfo(context, contentTitle, contentText,
 				contentIntent);
-
 		final int HELLO_ID = 1;
-
 		mNotificationManager.notify(HELLO_ID, notification);
 	}
 

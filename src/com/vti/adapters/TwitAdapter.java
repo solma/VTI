@@ -124,10 +124,10 @@ public class TwitAdapter extends BaseAdapter {
 		downThumbs_button.setVisibility(View.VISIBLE);
 
 		final TextView upThumbs = (TextView) row.findViewById(R.id.upThumbsNum);
-		upThumbs.setText(Long.toString(twit.getUpThumbs()));
+		//upThumbs.setText(Long.toString(twit.getUpThumbs()));
 		final TextView downThumbs = (TextView) row
 				.findViewById(R.id.downThumbsNum);
-		upThumbs.setText(Long.toString(twit.getDownThumbs()));
+		//upThumbs.setText(Long.toString(twit.getDownThumbs()));
 
 		// update the # of upThumb votes and the # of downThumb votes
 		upThumbs_button.setOnClickListener(new OnClickListener() {
@@ -136,10 +136,10 @@ public class TwitAdapter extends BaseAdapter {
 				InetAddress addr = null;
 				SocketAddress sockaddr = null;
 				PrintWriter out = null;
-				BufferedReader in = null;
+				//BufferedReader in = null;
 				Socket clientSocket = new Socket();
 				if(twit.getAlreadyVotedUp())
-					Toast.makeText(context, "Already voted up once!",Toast.LENGTH_SHORT );
+					Toast.makeText(context, Constants.REPEAT_VOTE, Toast.LENGTH_SHORT );
 				else{
 					try {
 						addr = InetAddress.getByName(Constants.SERVER_IP);
@@ -163,22 +163,21 @@ public class TwitAdapter extends BaseAdapter {
 						out = new PrintWriter(clientSocket.getOutputStream(),
 								true);
 
-						in = new BufferedReader(new InputStreamReader(
-								clientSocket.getInputStream()));
+						//in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 						/**
 						 * Integer timeout in milliseconds for blocking accept
 						 * or read/receive operations (but not write/send
 						 * operations). A timeout of 0 means no timeout.
 						 */
-						while (in.readLine() != null)
-							;
-						Log.e(TAG, "After readLine.");
+						//while (in.readLine() != null);
+						//Log.e(TAG, "After readLine.");
 						out.print(twit.getTwitId() + "," + voterName + ",up");
 						out.close();
 						clientSocket.close();
 						twit.increaseUpThumbs();
-						upThumbs.setText(String.valueOf(twit.getUpThumbs()));
+						//upThumbs.setText(String.valueOf(twit.getUpThumbs()));
 						twit.setAlreadyVotedUp();
+						Toast.makeText(context, Constants.VOTE_SUCCESS,	Toast.LENGTH_SHORT).show();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -192,10 +191,10 @@ public class TwitAdapter extends BaseAdapter {
 				InetAddress addr = null;
 				SocketAddress sockaddr = null;
 				PrintWriter out = null;
-				BufferedReader in = null;
+				//BufferedReader in = null;
 				Socket clientSocket = new Socket();
 				if(twit.getAlreadyVotedDown())
-					Toast.makeText(context, "Already voted down once!",Toast.LENGTH_SHORT );
+					Toast.makeText(context, Constants.REPEAT_VOTE,Toast.LENGTH_SHORT );
 				else{
 					try {
 						addr = InetAddress.getByName(Constants.SERVER_IP);
@@ -218,23 +217,21 @@ public class TwitAdapter extends BaseAdapter {
 					try {
 						out = new PrintWriter(clientSocket.getOutputStream(),
 								true);
-
-						in = new BufferedReader(new InputStreamReader(
-								clientSocket.getInputStream()));
+						//in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 						/**
 						 * Integer timeout in milliseconds for blocking accept
 						 * or read/receive operations (but not write/send
 						 * operations). A timeout of 0 means no timeout.
 						 */
-						while (in.readLine() != null)
-							;
-						Log.e(TAG, "After readLine.");
+						//while (in.readLine() != null);
+						//Log.e(TAG, "After readLine.");
 						out.print(twit.getTwitId() + "," + voterName + ",down");
 						out.close();
 						clientSocket.close();
 						twit.increaseDownThumbs();
-						downThumbs.setText(String.valueOf(twit.getDownThumbs()));
+						//downThumbs.setText(String.valueOf(twit.getDownThumbs()));
 						twit.setAlreadyVotedDown();
+						Toast.makeText(context, Constants.VOTE_SUCCESS,	Toast.LENGTH_SHORT).show();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

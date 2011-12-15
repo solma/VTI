@@ -3,13 +3,17 @@ package com.vti.utils;
 import java.io.IOException;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import android.util.Log;
 
 import com.google.android.maps.GeoPoint;
+import com.vti.Constants;
 
 public class GeoCoder {
 	private static final String TAG=GeoCoder.class.getSimpleName();
+	
 	public static GeoPoint geocode(String address){
 		String url="http://maps.googleapis.com/maps/api/geocode/xml?address="+address+"&sensor=true";
 		String[] laln=new String[2];
@@ -25,5 +29,21 @@ public class GeoCoder {
 		}
 		return null;
 	}
+	
+	/*
+	 * @return the VTI account corresponds to the geopoint
+	 */
+	public static String reverseGeocode(GeoPoint p){
+		int row, col;
+		row=(int) ((p.getLatitudeE6()-Constants.SOUTH*1.0E6)/Constants.ZONE_LATITUDE);
+		col=(int) ((p.getLongitudeE6()-Constants.WEST*1.0E6)/Constants.ZONE_LONGITUDE);
+		Log.d(TAG,"Subscribing account:  vti_zone_"+row+col);
+		if(row>=0&&row<=9&&col>=0&&col<=9)
+			return "vti_zone_"+row+col;
+		else
+			return null;
+	}
+	
+
 
 }

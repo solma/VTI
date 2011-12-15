@@ -18,7 +18,7 @@
     <item
         android:id="@+id/feedback"
         android:enabled="true"
-        android:icon="@drawable/feedback"
+        android:icon="@drawable/vti_feedback"
         android:title="@string/feedback">
     </item>
 

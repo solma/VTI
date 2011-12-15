@@ -19,8 +19,10 @@ import org.w3c.dom.Document;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -39,7 +41,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,10 +58,22 @@ import com.vti.utils.GeoCoder;
 import com.vti.utils.PercentEncode;
 
 public class RouteSubscription extends MapActivity {
+	/** 
+	 * Warning Messages
+	 */
 	private static final String TAG = RouteSubscription.class.getSimpleName();
 	private static final String ROUTE_QUERY_FAILURE="Cannot find a route given the From-To pair.";
 	private static final String ROUTE_SUBSCRIBE_FAILURE="Failed to subscribe to the route.";
-	
+	private static final String WAIT_MESSAGE="Calculating routes and relevant VTI Twitter accounts......";
+	/**
+	 * SharedPreference file and key names
+	 */
+	private static final String DELIMITER="VTI_BREAK";
+	private static final String FROM_HISTORY="FromHistory";
+	private static final String TO_HISTORY="ToHistory";
+	private static final int HISTORY_SIZE=5;
+	private static final String LAST_VTI_ACCOUNTS="LastVTIAccounts";
+	private static final String SETTINGS="RouteSubscription";
 	/**
 	 * UI widgets
 	 */
@@ -71,32 +84,65 @@ public class RouteSubscription extends MapActivity {
 	private Button subscribeButton;
 	private ImageButton switchButton;
 	private RadioButton priv;
-	private RadioButton pub;
+	//private RadioButton pub;
 	private EditText from;
 	private EditText to;
-	private Spinner fromSpinner;
-	private Spinner toSpinner;
+	private ImageButton fromSpinner;
+	private ImageButton toSpinner;
+	
+	private Context context;
+	private TwitterManager twitterManager;
+	private GeoUpdateHandler handler;
+	
+	private ArrayList<String> fromHistory;
+	private ArrayList<String> toHistory;
+	private ArrayList<String> vtiAccounts;
 	
 	private ArrayList<GeoPoint> priRoute;
 	private TransitRoute pubRoute;
 	private ArrayList<TransitRoute> transitRoutes;
-	private Context context;
-	private ArrayList<String> vtiAccounts;
-	private TwitterManager twitterManager;
-	
+
 	
 	public void onCreate(Bundle bundle) {
+		// initialize
 		super.onCreate(bundle);
-		setContentView(R.layout.route); // bind the layout to the activity
+		setContentView(R.layout.route); 
 		context = getApplicationContext();
 		twitterManager=new TwitterManager(getApplicationContext());
+		handler=new GeoUpdateHandler();
+		
+		// Restore preferences
+		int i;
+		String tmp = getSharedPreferences(SETTINGS, 0).getString(FROM_HISTORY, null);
+		//from history
+		fromHistory=new ArrayList<String>();
+		if(tmp!=null){
+			String[] fields=tmp.split(DELIMITER);
+			for(i=0;i<fields.length;i++)
+				fromHistory.add(fields[i]);
+		}
+		//to history
+		toHistory=new ArrayList<String>();
+		tmp = getSharedPreferences(SETTINGS, 0).getString(TO_HISTORY, null);
+		if(tmp!=null){
+			String[] fields=tmp.split(DELIMITER);
+			for(i=0;i<fields.length;i++)
+				toHistory.add(fields[i]);
+		}
+		// vti accounts
 		vtiAccounts=new ArrayList<String>();
+		tmp = getSharedPreferences(SETTINGS, 0).getString(LAST_VTI_ACCOUNTS, null);
+		if(tmp!=null){
+			String[] fields=tmp.split(DELIMITER);
+			for(i=0;i<fields.length;i++)
+				vtiAccounts.add(fields[i]);
+		}	
 		
 		// create a map view
 		mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setStreetView(true);
-		mapView.setTraffic(true);
+		//mapView.setTraffic(true);
 		mapController = mapView.getController();
 		mapController.setZoom(14); // Zoom 1 is world view
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -105,13 +151,11 @@ public class RouteSubscription extends MapActivity {
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		criteria.setAltitudeRequired(false);
 		String bestProvider=locationManager.getBestProvider(criteria, true);
-		Location lastKnownLocation=locationManager.getLastKnownLocation(bestProvider);
-		
-		locationManager.requestLocationUpdates(bestProvider, 0, 0, new GeoUpdateHandler());
+		//Location lastKnownLocation=locationManager.getLastKnownLocation(bestProvider);
+		locationManager.requestLocationUpdates(bestProvider, Constants.MINTIME, Constants.MINDISTANCE, handler);
 
 		priv=(RadioButton) findViewById(R.id.priv);
-		pub=(RadioButton) findViewById(R.id.pub);
-		
+		//pub=(RadioButton) findViewById(R.id.pub);
 
 		from = (EditText) findViewById(R.id.from_text);
 		to = (EditText) findViewById(R.id.to_text);
@@ -129,10 +173,30 @@ public class RouteSubscription extends MapActivity {
 			public void onClick(final View v) {
 				String origin=from.getText().toString().trim()+",Chicago";
 				String dest=to.getText().toString().trim()+",Chicago";
+				int i;
+				ArrayList<String> copy;
 				if(priv.isChecked()){
 					subscribePriRoute(origin, dest);
 				}else{
 					subscribeTransitRoute(origin, dest);
+				}
+				if(fromHistory.size()<HISTORY_SIZE)
+					fromHistory.add(from.getText().toString().trim());
+				else{
+					copy=new ArrayList<String>();
+					for(i=1;i<HISTORY_SIZE;i++)
+						copy.add(fromHistory.get(i));
+					copy.add(from.getText().toString().trim());
+					fromHistory=copy;
+				}
+				if(toHistory.size()<HISTORY_SIZE)
+					toHistory.add(to.getText().toString().trim());
+				else{
+					copy=new ArrayList<String>();
+					for(i=1;i<HISTORY_SIZE;i++)
+						copy.add(fromHistory.get(i));
+					copy.add(to.getText().toString().trim());
+					toHistory=copy;
 				}
 			}
 		});
@@ -146,6 +210,119 @@ public class RouteSubscription extends MapActivity {
 				from.setText(toText);
 			}
 		});
+		
+		fromSpinner = (ImageButton) findViewById(R.id.from_spinner);
+		fromSpinner.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				handleSpinner("from");
+			}
+		});
+		
+		toSpinner = (ImageButton) findViewById(R.id.to_spinner);
+		toSpinner.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				handleSpinner("to");
+			}
+		});
+	}
+	
+		
+	@Override
+    protected void onPause() {
+        //remove the listener
+        locationManager.removeUpdates(handler);
+        super.onPause();
+    }
+ 
+	@Override
+    protected void onResume() {
+        //add the listener again
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MINTIME, Constants.MINDISTANCE, handler);
+        super.onResume();
+    }
+	
+	@Override
+	protected void onStop(){
+		locationManager.removeUpdates(handler);
+	    super.onStop();
+		// We need an Editor object to make preference changes.
+		// All objects are from android.context.Context
+		SharedPreferences settings = getSharedPreferences(SETTINGS, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		StringBuilder write=new StringBuilder();
+		int i;
+		//edit fromHistory
+		write.delete(0, write.length());
+		for(i=0;i<fromHistory.size();i++){
+			write.append(fromHistory.get(i));
+			if(i<fromHistory.size()-1)
+				write.append(DELIMITER);
+		}
+		editor.putString(FROM_HISTORY, write.toString());
+		//edit toHistory
+		write.delete(0, write.length());
+		for(i=0;i<toHistory.size();i++){
+			write.append(toHistory.get(i));
+			if(i<toHistory.size()-1)
+				write.append(DELIMITER);
+		}
+		editor.putString(TO_HISTORY, write.toString());
+		//edit vti accounts
+		write.delete(0, write.length());
+		for(i=0;i<vtiAccounts.size();i++){
+			write.append(vtiAccounts.get(i));
+			if(i<vtiAccounts.size()-1)
+				write.append(DELIMITER);
+		}
+		editor.putString(LAST_VTI_ACCOUNTS, write.toString());
+
+		// Commit the edits!
+		editor.commit();
+	}
+	
+	protected void handleSpinner(final String id){
+		final CharSequence[] items;
+		int i;
+		if(id.equals("from")){
+			 items= new CharSequence[fromHistory.size()];
+			 for(i=0;i<items.length;i++)
+					items[i]=fromHistory.get(i);
+		}
+		else{
+			items=new CharSequence[toHistory.size()];
+			for(i=0;i<items.length;i++)
+				items[i]=toHistory.get(i);
+		}
+		final String fromText=from.getText().toString();
+		final String toText=to.getText().toString();
+		
+		AlertDialog select=new AlertDialog.Builder(RouteSubscription.this)
+        .setTitle("Please select from last "+HISTORY_SIZE+" inputs")
+        .setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            	Log.e(TAG, "select is "+whichButton);
+   				if(id.equals("from"))
+   					from.setText(items[whichButton]);
+   				else
+   					to.setText(items[whichButton]);
+            }
+        })
+        .setPositiveButton("Select", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+             }
+        })
+        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+   				if(id.equals("from"))
+   					from.setText(fromText);
+   				else
+   					to.setText(toText);
+            }
+        })
+       .create();
+		select.show();
 	}
 	
 	protected void selectTransitRoute(int id){
@@ -184,20 +361,21 @@ public class RouteSubscription extends MapActivity {
 	}
 	
 	protected boolean subscribeTransitRoute(String origin, String dest){
+		Toast.makeText(context,	WAIT_MESSAGE,Toast.LENGTH_SHORT).show();
 		ArrayList<String> routes = calculateTransitRoutes(origin, dest);
 		if (routes.size() > 0) {
 			transitRoutes=new ArrayList<TransitRoute>();
+			//default choice
 			final CharSequence[] items = new CharSequence[routes.size()];
 			for(int i=0;i<routes.size();i++){
 				transitRoutes.add(new TransitRoute(routes.get(i)));
 				items[i]=transitRoutes.get(i).getTitle();
 			}
-			//default choice
 			pubRoute=transitRoutes.get(0);
 			// Step1: select a route
 			AlertDialog select=new AlertDialog.Builder(RouteSubscription.this)
             .setTitle("Please select one of the following routes")
-            .setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+            .setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                 	//Log.e(TAG, "id="+whichButton);
                 	showTransitRouteDetail(whichButton);
@@ -209,6 +387,12 @@ public class RouteSubscription extends MapActivity {
        				// Step 2: draw and subscribe a route
        				Log.e(TAG, "Before draw the pubRoute");
        				drawAndSubscribeTransitRoute(pubRoute, Color.BLUE, mapView);
+       				Toast.makeText(context,
+       						"Successuflly subscribe to route <From = "
+       								+ from.getText().toString()
+       								+ " To = "
+       								+ to.getText().toString() + ">",
+       						Toast.LENGTH_LONG).show();
                  }
             })
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -218,39 +402,23 @@ public class RouteSubscription extends MapActivity {
             })
            .create();
 			select.show();
-			
 			return true;
 		} else{
-			Toast.makeText(context,ROUTE_QUERY_FAILURE,Toast.LENGTH_SHORT).show();
+			Toast.makeText(context,ROUTE_QUERY_FAILURE,Toast.LENGTH_LONG).show();
 			return false;
 		}
 	}
 
-	protected void subscribePriRoute(String origin, String dest) {
+	protected boolean subscribePriRoute(String origin, String dest) {
+		Toast.makeText(context,	WAIT_MESSAGE,Toast.LENGTH_SHORT).show();
+		String accountName;
 		if (calculatePriRoute(buildURL(origin,dest,false))) {
 			drawPriRoute(priRoute, Color.BLUE, mapView);
-			ArrayList<String> vtiAccounts=new ArrayList<String>();
-			String streetName, streetNumber;
-			Element e;
-			for(GeoPoint point: priRoute){
-				streetName=streetNumber="";
-				Double la=(Double)(point.getLatitudeE6()/1.0E6);
-				Double ln=(Double)(point.getLongitudeE6()/1.0E6);
-				String url="http://maps.googleapis.com/maps/api/geocode/xml?address="+la+"+"+ln+"&sensor=true";
-				try {
-					org.jsoup.nodes.Document doc=Jsoup.connect(url).get();
-					if(doc!=null){
-						streetName=doc.select("result > address_component > type:matches(route)").parents().first().select("long_name").text();
-						e=doc.select("result > address_component > type:matches(street_number)").first();
-						if(e!=null)
-							streetNumber=e.parents().first().select("long_name").text();
-						Log.d(TAG,streetName+" "+streetNumber);
-					}
-					else
-						Log.d(TAG,la+" "+ln);
-				} catch (IOException ex) {
-					Log.d(TAG,la+" "+ln);
-					ex.printStackTrace();
+			for(int i=0;i<priRoute.size();i++){
+				accountName=GeoCoder.reverseGeocode(priRoute.get(i));
+				if(accountName!=null){
+					twitterManager.follow(accountName);
+					vtiAccounts.add(accountName);
 				}
 			}
 			Toast.makeText(context,
@@ -258,36 +426,17 @@ public class RouteSubscription extends MapActivity {
 									+ from.getText().toString()
 									+ " To = "
 									+ to.getText().toString() + ">",
-							Toast.LENGTH_SHORT).show();
-
-		} else
-			Toast.makeText(context,ROUTE_QUERY_FAILURE,Toast.LENGTH_SHORT).show();
+							Toast.LENGTH_LONG).show();
+			return true;
+		} else{
+			Toast.makeText(context,ROUTE_QUERY_FAILURE,Toast.LENGTH_LONG).show();
+			return false;
+		}
 	}
 
 	@Override
 	protected boolean isRouteDisplayed() {
 		return false;
-	}
-	
-	private String buildURL(GeoPoint src, GeoPoint dest, boolean pub){
-		// connect to map web service
-		StringBuilder urlString = new StringBuilder();
-		urlString.append("http://maps.google.com/maps?f=d&hl=en");
-		urlString.append("&saddr=");// from
-		urlString.append(Double.toString((double) src.getLatitudeE6() / 1.0E6));
-		urlString.append(",");
-		urlString.append(Double.toString((double) src.getLongitudeE6() / 1.0E6));
-		urlString.append("&daddr=");// to
-		urlString.append(Double.toString((double) dest.getLatitudeE6() / 1.0E6));
-		urlString.append(",");
-		urlString.append(Double.toString((double) dest.getLongitudeE6() / 1.0E6));
-		urlString.append("&ie=UTF8&0&om=0");
-		if(!pub)
-			urlString.append("&output=kml");
-		else
-			urlString.append("&dirflg=r&output=html");
-		Log.d(TAG, "URL=" + urlString.toString());
-		return urlString.toString();
 	}
 	
 	/*
@@ -464,6 +613,7 @@ public class RouteSubscription extends MapActivity {
 				mode=8; 
 				// only subscribe to train station
 				twitterManager.follow(station.getVTIAccount());
+				vtiAccounts.add(station.getVTIAccount());
 			}
 			else mode=9; //mode=9 -> bus;
 			stationPoint=station.getGeoPoint();

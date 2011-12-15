@@ -1,13 +1,13 @@
 package com.vti.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-
-import com.google.android.maps.GeoPoint;
-import com.vti.utils.GeoCoder;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.android.maps.GeoPoint;
+import com.vti.Constants;
+import com.vti.utils.GeoCoder;
 
 public class Station implements Parcelable{
 	private String routeName;
@@ -15,6 +15,7 @@ public class Station implements Parcelable{
 	private String stationName;
 	private GeoPoint coordinates;
 	private String vtiAccount;
+	
 	
 	public Station(String routeId, String name){
 		routeName=routeId;
@@ -25,8 +26,8 @@ public class Station implements Parcelable{
 			//assign vtiAccount
 			vtiAccount=stationName;
 			vtiAccount="vti_"+vtiAccount.replaceAll("-", "_").replaceAll("/","_").replaceAll(" ","_");
-			if(vtiAccount.length()>20)
-				vtiAccount=vtiAccount.substring(0,20);
+			if(vtiAccount.length()>Constants.TWITTER_USER_NAME_LENGTH_LIMIT)
+				vtiAccount=vtiAccount.substring(0,Constants.TWITTER_USER_NAME_LENGTH_LIMIT-1);
 			
 			for(int i=0;i<colors.length;i++){
 				if(stationName.contains(colors[i])){

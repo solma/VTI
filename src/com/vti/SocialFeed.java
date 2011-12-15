@@ -12,9 +12,7 @@
  */
 package com.vti;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -25,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import twitter4j.GeoLocation;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import android.app.AlarmManager;
 import android.app.Dialog;
@@ -57,8 +57,8 @@ import android.widget.Toast;
 
 import com.vti.adapters.TwitAdapter;
 import com.vti.managers.AccountManager;
-import com.vti.managers.TwitterManager;
 import com.vti.managers.LocManager;
+import com.vti.managers.TwitterManager;
 import com.vti.model.Twit;
 import com.vti.services.ISocialService;
 import com.vti.services.SocialServiceImpl;
@@ -86,7 +86,7 @@ public class SocialFeed extends ListActivity {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			dialog.setMessage("Loading twits...");
+			dialog.setMessage("Loading twits......");
 			dialog.show();
 		}
 
@@ -141,7 +141,7 @@ public class SocialFeed extends ListActivity {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			dialog.setMessage("Refreshing twits...");
+			dialog.setMessage("Refreshing twits......");
 			dialog.show();
 		}
 
@@ -249,19 +249,14 @@ public class SocialFeed extends ListActivity {
 	};
 
 	private ServiceConnection connection = new ServiceConnection() {
-
 		// Called when the connection with the service is established
 		public void onServiceConnected(final ComponentName className,
 				final IBinder service) {
 			socialService = ISocialService.Stub.asInterface(service);
-
-			// As soon as Service connection is established load data
-			// from DB
+			// As soon as Service connection is established load data from DB
 			FetchFromDBTask fetchFromDBTask = new FetchFromDBTask();
 			fetchFromDBTask.execute(authMgr.getAuthTokens());
-
-			// Also register onclick listener for refresh button, its
-			// now safe to do so
+			// Also register onclick listener for refresh button, its now safe to do so
 			refreshButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(final View v) {
@@ -320,11 +315,8 @@ public class SocialFeed extends ListActivity {
 			}
 
 		} catch (Exception ex) {
-			// To ensure application does not crash
-			Log.e(TAG,
-					"Got exception in SocialFeed.onCreate() " + ex.getMessage());
+				Log.e(TAG,	"Got exception in SocialFeed.onCreate() " + ex.getMessage());
 		}
-
 	}
 
 	/**
@@ -480,6 +472,7 @@ public class SocialFeed extends ListActivity {
 		dialog.setTitle("Thansk for your feedback.");
 		dialog.setContentView(R.layout.feed_back);
 
+		final Twitter twitter=new TwitterManager(getApplicationContext()).getTwitter();
 		final Button feedbackButton = (Button) dialog.findViewById(R.id.sendFeedback);
 		final Button cancelButton = (Button) dialog.findViewById(R.id.cancel_button);
 		final EditText feedbackText = (EditText) dialog.findViewById(R.id.feedback_text);
@@ -491,9 +484,7 @@ public class SocialFeed extends ListActivity {
 				InetAddress addr = null;
 				SocketAddress sockaddr = null;
 				PrintWriter out = null;
-				BufferedReader in = null;
 				Socket clientSocket = new Socket();
-	
 				try {
 					addr = InetAddress.getByName(Constants.SERVER_IP);
 					sockaddr = new InetSocketAddress(addr,
@@ -512,17 +503,23 @@ public class SocialFeed extends ListActivity {
 				}
 				try {
 					out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-					in = new BufferedReader(new InputStreamReader(clientSocket
-							.getInputStream()));
-					Log.e(TAG, "After readLine.");
-					out.print("Feedback\n" + feedbackText.getText().toString());
+					out.println("Feedback");
+					if(twitter!=null)
+						try {
+							out.println(twitter.getScreenName());
+						} catch (Exception e) {
+							out.println("anonymous");
+							e.printStackTrace();
+						}
+					else
+						out.println("anonymous");
+					out.println(feedbackText.getText().toString());
 					out.close();
 					clientSocket.close();
+					Toast.makeText(getApplicationContext(),"Successfully sent feedback.", Toast.LENGTH_SHORT).show();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
 			}
 		});
 		
@@ -649,7 +646,6 @@ public class SocialFeed extends ListActivity {
 		NotificationManager notificationManager = (NotificationManager) getApplicationContext()
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.cancelAll();
-
 	}
 
 	/*
@@ -693,7 +689,6 @@ public class SocialFeed extends ListActivity {
 			refreshButton.performClick();
 			;
 		}
-
 		clearNotification();
 	}
 

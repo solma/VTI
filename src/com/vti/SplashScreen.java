@@ -59,7 +59,6 @@ public class SplashScreen extends Activity {
 			twitterButton = (ImageButton) findViewById(R.id.twitter);
 			createAuthorizationRequests(twitterButton);
 			
-			
 			accMgr = new AccountManager(getApplicationContext());
 			//FIXME - This is not the right place to set the alarm. We should have a broad cast receiver which listens for Phone Boot Event.
 			// When the phone boots we should set the alarm manager.
@@ -67,7 +66,6 @@ public class SplashScreen extends Activity {
 			// broadcast receiver there. That broadcast receiver will shut down or restart Alarm Manager depending on the battery condition.
 			// These changes will be coming soon.......
 			//setAlarm();
-						
 			if (accMgr.isAccountEmpty()) {
 				twitterButton.setVisibility(View.VISIBLE);
 				Log.d(TAG,"not authorized yet");
@@ -77,8 +75,6 @@ public class SplashScreen extends Activity {
 				navigateToSocialFeed();
 				Log.d(TAG,accMgr.getAuthTokens().toString());
 			}
-		
-		
 		} catch (Exception ex) {
 			//To ensure application does not crash
 			ex.printStackTrace();
@@ -90,22 +86,19 @@ public class SplashScreen extends Activity {
 	 * Set alarm manager for auto-refreshing twits
 	 */
 	private void setAlarm() {
-		
 		//FIXME - This is not the right place to set the alarm. We should have a broad cast receiver which listens for Phone Boot Event.
 		// When the phone boots we should set the alarm manager.
 		//FIXME - In the same broadcast receiver we should register our broadcast receiver to listen to battery levels and register another 
 		// broadcast receiver there. That broadcast receiver will shut down or restart Alarm Manager depending on the battery condition.
 		// These changes will be coming soon.......
 		final AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		final Intent intent = new Intent(getApplicationContext(),
-				AlarmReceiver.class);
+		final Intent intent = new Intent(getApplicationContext(),AlarmReceiver.class);
 		final PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
 				100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		final TwitterManager feedManager = new TwitterManager(getApplicationContext());
 		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
 				System.currentTimeMillis() + (5000),
 				feedManager.getTwitterFeedRefreshInterval(), pendingIntent);
-
 	}
 
 	/**
@@ -124,25 +117,19 @@ public class SplashScreen extends Activity {
 					
 					requestToken=twitter.getOAuthRequestToken(Constants.CALLBACK_URL);
 					System.err.println("twitterUrl=="+requestToken.getAuthorizationURL());
-	                /*
+	                /**
 	                 * @Documented
 	                 * Warning:  getOAuthRequestToken method can only be invoked once before getting accessToken, otherwise 
 					 * Twitter returns 401 error code;
 	                 */
-						
 					//final URI twitterUrl = new URI(twitter.getOAuthRequestToken(Constants.CALLBACK_URL).getAuthorizationURL());
 					final URI twitterUrl = new URI(requestToken.getAuthorizationURL());
 					authUrl = twitterUrl.toString();
-					
 					Log.d(TAG, authUrl);
-								
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri
-							.parse(authUrl)));
+					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(authUrl)));
 				} catch (final Exception e) {
 					e.printStackTrace();
-					Log.d(TAG ,
-							"Caught exception in createAuthorizationRequests "
-									+ e.getMessage());
+					Log.d(TAG ,	"Caught exception in createAuthorizationRequests"	+ e.getMessage());
 				}
 			}
 		});
@@ -159,18 +146,15 @@ public class SplashScreen extends Activity {
 			saveAccessToken(intent);
 			navigateToSocialFeed();
 		} catch (final Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
 	 * GO to List View to load twits
 	 */
 	private void navigateToSocialFeed() {
-		final Intent navIntent = new Intent(getApplicationContext(),
-				SocialFeed.class);
+		final Intent navIntent = new Intent(getApplicationContext(),SocialFeed.class);
 		finish();
 		startActivity(navIntent);
 	}

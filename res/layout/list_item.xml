@@ -1,44 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/list_item_background" >
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:background="@drawable/list_item_background">
+    <TextView
+        android:id="@+id/profileName"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="Profile Name"
+        android:textColor="#FF0000"
+        android:textSize="13sp" >
+    </TextView>
 
-	<TextView android:id="@+id/profileName" android:layout_width="120dp" android:layout_height="wrap_content" 
-		android:textSize="13sp" android:text="Profile Name" android:textColor="#FF0000" >
-	</TextView>
-   	<ImageView android:id="@+id/profileImage"
-		android:layout_width="100dp" android:layout_height="wrap_content"
-		android:src="@drawable/placeholder_icon" 
-	    android:layout_below="@id/profileName"
-	    android:padding="10dp"
-		android:layout_centerVertical="true">
-	</ImageView>
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profileName"
+        android:layout_centerVertical="true"
+        android:padding="10dp"
+        android:src="@drawable/placeholder_icon" >
+    </ImageView>
 
-	<TextView android:id="@+id/twitMessage" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:textSize="13sp"
-		android:layout_toRightOf="@id/profileName"
-		android:paddingTop="10dp"
-		android:minLines="4">
-	</TextView>
-	
-	 <TextView android:id="@+id/downThumbsNum" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:textSize="20sp" android:text="0" 
-        android:layout_below="@id/twitMessage" android:layout_alignRight="@id/twitMessage" android:layout_centerVertical="true">
-     </TextView>
-     <ImageButton android:id="@+id/downThumbsPic" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:background="@drawable/thumb_down_button"
-        android:layout_below="@id/twitMessage" android:layout_toLeftOf="@id/downThumbsNum">
-     </ImageButton>
-     <ImageButton android:id="@+id/upThumbsPic" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:background="@drawable/thumb_up_button"
-        android:layout_below="@id/twitMessage" android:layout_toLeftOf="@id/downThumbsPic">
-     </ImageButton>
-     <TextView android:id="@+id/upThumbsNum" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:textSize="20sp" android:text="0" 
-        android:layout_below="@id/twitMessage" android:layout_toLeftOf="@id/upThumbsPic" android:layout_centerVertical="true">
-     </TextView>
+    <TextView
+        android:id="@+id/twitMessage"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/profileName"
+        android:minLines="4"
+        android:paddingTop="10dp"
+        android:textSize="13sp" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/downThumbsNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/twitMessage"
+        android:layout_below="@id/twitMessage"
+        android:layout_centerVertical="true"
+        android:textSize="20sp" >
+    </TextView>
+
+    <ImageButton
+        android:id="@+id/downThumbsPic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/twitMessage"
+        android:layout_toLeftOf="@id/downThumbsNum"
+        android:background="@drawable/thumb_down_button" >
+    </ImageButton>
+    
+    <ImageButton
+        android:id="@+id/upThumbsPic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/twitMessage"
+        android:layout_toLeftOf="@+id/downThumbsPic"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/thumb_up_button" />
+
+    <TextView
+        android:id="@+id/upThumbsNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/twitMessage"
+        android:layout_centerVertical="true"
+        android:textSize="20sp" >
+    </TextView>
+
 
 
 </RelativeLayout>
-

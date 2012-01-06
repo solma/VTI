@@ -17,10 +17,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * @author rohit
- * 
- */
 class FlushedInputStream extends FilterInputStream {
 
 	/**

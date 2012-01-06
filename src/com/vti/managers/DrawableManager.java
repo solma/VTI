@@ -29,10 +29,6 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.ImageView;
 
-/**
- * @author rohit
- * 
- */
 public class DrawableManager {
 	private static final String TAG = DrawableManager.class.getSimpleName();
 

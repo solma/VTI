@@ -2,28 +2,67 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent" android:layout_height="match_parent"
 	android:orientation="vertical">
+
+	
 	<RelativeLayout  android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:background="@drawable/screen_background">
 		<TextView android:id="@+id/title" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:text="@string/notifications"
+			android:layout_height="wrap_content" android:text="@string/notifications" android:textColor="#FFFFFF"
 			android:layout_alignParentLeft="true" android:textSize="28dip"
 			android:paddingLeft="10dip" ></TextView>
 		<ImageButton android:id="@+id/force_refresh"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:layout_alignParentRight="true" android:background="@drawable/refresh_button"></ImageButton>
 	</RelativeLayout>
-	<LinearLayout android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<Button android:id="@+id/publish" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:layout_weight="1"
-			android:text="@string/publish"></Button>
-		<Button android:id="@+id/follow_unfollow" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:layout_weight="1"
-			android:text="(Un)Follow"></Button>
-		<Button android:id="@+id/route" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:layout_weight="1"
-			android:text="@string/route"></Button>
+
+	<ListView
+	    android:id="@android:id/list"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="1.0" >
+	</ListView>
+	
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/function_button_background" >
+
+		<ImageButton
+		    android:id="@+id/publish"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentLeft="true"
+		    android:layout_weight="1"
+		    android:background="@drawable/publish" >
+		</ImageButton>
+		<!-- 	android:layout_alignParentLeft="true" android:layout_weight="1"-->
+		<ImageButton android:id="@+id/route" android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:background="@drawable/route"></ImageButton>
+		<ImageButton
+		    android:id="@+id/follow_unfollow"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:background="@drawable/follow_unfollow" >
+		</ImageButton>
+		<ImageButton
+		    android:id="@+id/follow"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:background="@drawable/follow" >
+		</ImageButton>
+		<ImageButton
+		    android:id="@+id/unfollow"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:layout_toLeftOf="@id/route"
+		    android:background="@drawable/unfollow" >
+		</ImageButton>
 	</LinearLayout>
-	<ListView android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:id="@android:id/list"></ListView>
+
+
 </LinearLayout>

@@ -29,6 +29,7 @@ public class DBAdapter
 
 	
 	public static final String KEY_TWITID = "_id";
+	public static final String KEY_TIMESTAMP="timestamp";
 	public static final String KEY_PROFILE_NAME = "profile_name";
 	public static final String KEY_PROFILE_IMAGE_URL = "profile_image";
 	public static final String KEY_TWIT_MESSAGE = "message";
@@ -40,7 +41,8 @@ public class DBAdapter
 	
 	private static final int DATABASE_VERSION = 1;
 
-	private static final String DATABASE_CREATE = "create table "+DATABASE_TABLE+" ("+KEY_TWITID+" integer primary key , "
+	private static final String DATABASE_CREATE = 
+			"create table "+DATABASE_TABLE+" ("+KEY_TWITID+" integer primary key , "+ KEY_TIMESTAMP + " integer not null, " 
 			+ KEY_PROFILE_NAME+" text not null, "+KEY_PROFILE_IMAGE_URL+" text not null, " + KEY_TWIT_MESSAGE+" text not null, "
 			+ KEY_UP_THUMBS+" integer not null, "+ KEY_DOWN_THUMBS+ " integer not null) ;";
 
@@ -98,10 +100,11 @@ public class DBAdapter
 
 
 	// ---insert a twit into the database---
-	public long insertTwit(final long twitId,final String profileName, final String profileImageUri, final String twitMessage, final long upThumbs, final long downThumbs)
+	public long insertTwit(final long twitId, final long timestamp, final String profileName, final String profileImageUri, final String twitMessage, final long upThumbs, final long downThumbs)
 	{
 		final ContentValues initialValues = new ContentValues();
 		initialValues.put(KEY_TWITID, twitId);
+		initialValues.put(KEY_TIMESTAMP, timestamp);
 		initialValues.put(KEY_PROFILE_NAME, profileName);
 		initialValues.put(KEY_PROFILE_IMAGE_URL, profileImageUri);
 		initialValues.put(KEY_TWIT_MESSAGE, twitMessage);
@@ -111,10 +114,11 @@ public class DBAdapter
 	}
 
 	// ---insert a twit into the database---
-	public long updateTwit(final long twitId,final String profileName, final String profileImageUri, final String twitMessage, final long upThumbs, final long downThumbs)
+	public long updateTwit(final long twitId, final long timestamp, final String profileName, final String profileImageUri, final String twitMessage, final long upThumbs, final long downThumbs)
 	{
 		final ContentValues updatedValues = new ContentValues();
 		updatedValues.put(KEY_TWITID, twitId);
+		updatedValues.put(KEY_TIMESTAMP, timestamp);
 		updatedValues.put(KEY_PROFILE_NAME, profileName);
 		updatedValues.put(KEY_PROFILE_IMAGE_URL, profileImageUri);
 		updatedValues.put(KEY_TWIT_MESSAGE, twitMessage);
@@ -133,7 +137,7 @@ public class DBAdapter
 	// ---retrieves all the twits---
 	public Cursor getAllTwits()
 	{
-		return db.query(DATABASE_TABLE, new String[] { KEY_TWITID, KEY_PROFILE_NAME, KEY_PROFILE_IMAGE_URL, KEY_TWIT_MESSAGE, KEY_UP_THUMBS, KEY_DOWN_THUMBS }, null, null, null,
+		return db.query(DATABASE_TABLE, new String[] { KEY_TWITID, KEY_TIMESTAMP, KEY_PROFILE_NAME, KEY_PROFILE_IMAGE_URL, KEY_TWIT_MESSAGE, KEY_UP_THUMBS, KEY_DOWN_THUMBS }, null, null, null,
 				null, KEY_TWITID + " DESC");
 	}
 

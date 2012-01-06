@@ -16,14 +16,8 @@ public class LocManager {
 	private Context context;
 	private Location latestLocation;
 	private LocationManager locationMgr;
-	// Define a listener that responds to location updates
-	private LocationListener locationListener;
 
 	public Location getLatestLocation() {
-		// Register the listener with the Location Manager to receive location updates
-		// TODO: runtime error here, neet to be fixed
-		//locationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-		//Criteria c=new Criteria();
 		for(String provider: locationMgr.getAllProviders()){
 			Location location=locationMgr.getLastKnownLocation(provider);
 			if(location!=null){				
@@ -33,30 +27,17 @@ public class LocManager {
 		}
 		return latestLocation;
 	}
+	
+	public LocationManager getLocationManager(){
+		return locationMgr;
+	}
 
 	public LocManager(Context ctxt) {
 		this.context = ctxt;
 		// latestLocation=null;
 		latestLocation = new Location(LocationManager.GPS_PROVIDER);
 		// Acquire a reference to the system Location Manager
-		locationMgr = (LocationManager) context
-				.getSystemService(Context.LOCATION_SERVICE);
-		locationListener= new LocationListener() {
-				public void onLocationChanged(Location location) {
-					// Called when a new location is found by the network location provider.
-					// e.g. display the new location on a map
-				}
-
-				@Override
-				public void onStatusChanged(String provider, int status, Bundle extras) {
-				}
-
-				public void onProviderEnabled(String provider) {
-				}
-
-				public void onProviderDisabled(String provider) {
-				}
-			};
+		locationMgr = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
 
 	/**

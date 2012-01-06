@@ -24,15 +24,7 @@ import android.content.SharedPreferences.Editor;
 
 import com.vti.Constants;
 
-/**
- * @author rohit
- * 
- */
 public class AccountManager {
-	private static final String AUTHORIZATIONS = "OAuthAccessTokens";
-	private static final String ACCESS_TOKEN = "AccessToken";
-	private static final String TOKEN_SECRET = "TokenSecret";
-
 	private TwitterFactory tf;
 
 	private Context context;
@@ -40,9 +32,9 @@ public class AccountManager {
 	public AccountManager(Context ctxt) {
 		this.context = ctxt;
 		final SharedPreferences settings = context.getSharedPreferences(
-				AUTHORIZATIONS, 0);
-		String accessToken = settings.getString(ACCESS_TOKEN, null);
-		String tokenSecret = settings.getString(TOKEN_SECRET, null);
+				Constants.AUTHORIZATION_PREFERENCE_FILE , 0);
+		String accessToken = settings.getString(Constants.ACCESS_TOKEN, null);
+		String tokenSecret = settings.getString(Constants.TOKEN_SECRET, null);
 
 		if (null != accessToken && null != tokenSecret) {
 			tf = new TwitterFactory(new ConfigurationBuilder()
@@ -92,12 +84,23 @@ public class AccountManager {
 	 */
 	public void saveAccount(String accessToken, String tokenSecret) {
 		final SharedPreferences settings = context.getSharedPreferences(
-				AUTHORIZATIONS, 0);
+				Constants.AUTHORIZATION_PREFERENCE_FILE , 0);
 		Editor editor = settings.edit();
-		editor.putString(ACCESS_TOKEN, accessToken);
-		editor.putString(TOKEN_SECRET, tokenSecret);
+		editor.putString(Constants.ACCESS_TOKEN, accessToken);
+		editor.putString(Constants.TOKEN_SECRET, tokenSecret);
 		editor.commit();
 	}
 
+	/**
+	 * Save the setting for future use
+	 */
+	public void saveSettings(int interval, boolean voiceNotify) {
+		final SharedPreferences settings = context.getSharedPreferences(
+				Constants.SETTING_PREFERENCE_FILE, 0);
+		Editor editor = settings.edit();
+		editor.putInt(Constants.UPDATE_FREQUENCY, interval);
+		editor.putBoolean(Constants.VOICE_NOTIFY, voiceNotify);
+		editor.commit();
+	}
 
 }

@@ -10,7 +10,7 @@ import com.vti.Constants;
 import com.vti.utils.GeoCoder;
 
 public class Station implements Parcelable{
-	private String routeName;
+	private String routeName; //e.g. "Blue Line" or "Red Line" 
 	private String mode;
 	private String stationName;
 	private GeoPoint coordinates;
@@ -30,8 +30,8 @@ public class Station implements Parcelable{
 				vtiAccount=vtiAccount.substring(0,Constants.TWITTER_USER_NAME_LENGTH_LIMIT-1);
 			
 			for(int i=0;i<colors.length;i++){
-				if(stationName.contains(colors[i])){
-					stationName=stationName.replaceAll(colors[i], "");
+				if(stationName.contains(colors[i])){ //e.g. Jackson-blue =>Jackson
+					stationName=stationName.replaceAll("-"+colors[i], "");
 					break;
 				}
 			}

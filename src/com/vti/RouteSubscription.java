@@ -33,6 +33,9 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -50,7 +53,7 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
-import com.vti.managers.AccountManager;
+import com.vti.managers.LocManager;
 import com.vti.managers.TwitterManager;
 import com.vti.model.Station;
 import com.vti.model.TransitRoute;
@@ -66,20 +69,10 @@ public class RouteSubscription extends MapActivity {
 	private static final String ROUTE_SUBSCRIBE_FAILURE="Failed to subscribe to the route.";
 	private static final String WAIT_MESSAGE="Calculating routes and relevant VTI Twitter accounts......";
 	/**
-	 * SharedPreference file and key names
-	 */
-	private static final String DELIMITER="VTI_BREAK";
-	private static final String FROM_HISTORY="FromHistory";
-	private static final String TO_HISTORY="ToHistory";
-	private static final int HISTORY_SIZE=5;
-	private static final String LAST_VTI_ACCOUNTS="LastVTIAccounts";
-	private static final String SETTINGS="RouteSubscription";
-	/**
 	 * UI widgets
 	 */
 	private MapController mapController;
 	private MapView mapView;
-	private LocationManager locationManager;
 	private Button unsubscribeButton;
 	private Button subscribeButton;
 	private ImageButton switchButton;
@@ -91,8 +84,10 @@ public class RouteSubscription extends MapActivity {
 	private ImageButton toSpinner;
 	
 	private Context context;
-	private TwitterManager twitterManager;
-	private GeoUpdateHandler handler;
+	private TwitterManager twitterMgr;
+	private LocManager locMgr;
+	private MapUpdateHandler mHandler;
+	private VTIAccountsUpdateHandler vHandler;
 	
 	private ArrayList<String> fromHistory;
 	private ArrayList<String> toHistory;
@@ -108,32 +103,32 @@ public class RouteSubscription extends MapActivity {
 		super.onCreate(bundle);
 		setContentView(R.layout.route); 
 		context = getApplicationContext();
-		twitterManager=new TwitterManager(getApplicationContext());
-		handler=new GeoUpdateHandler();
+		twitterMgr=new TwitterManager(getApplicationContext());
+		
 		
 		// Restore preferences
 		int i;
-		String tmp = getSharedPreferences(SETTINGS, 0).getString(FROM_HISTORY, null);
+		String tmp = getSharedPreferences(Constants.ROUTE_PREFERENCE_FILE, 0).getString(Constants.FROM_HISTORY, null);
 		//from history
 		fromHistory=new ArrayList<String>();
 		if(tmp!=null){
-			String[] fields=tmp.split(DELIMITER);
+			String[] fields=tmp.split(Constants.DELIMITER);
 			for(i=0;i<fields.length;i++)
 				fromHistory.add(fields[i]);
 		}
 		//to history
 		toHistory=new ArrayList<String>();
-		tmp = getSharedPreferences(SETTINGS, 0).getString(TO_HISTORY, null);
+		tmp = getSharedPreferences(Constants.ROUTE_PREFERENCE_FILE, 0).getString(Constants.TO_HISTORY, null);
 		if(tmp!=null){
-			String[] fields=tmp.split(DELIMITER);
+			String[] fields=tmp.split(Constants.DELIMITER);
 			for(i=0;i<fields.length;i++)
 				toHistory.add(fields[i]);
 		}
 		// vti accounts
 		vtiAccounts=new ArrayList<String>();
-		tmp = getSharedPreferences(SETTINGS, 0).getString(LAST_VTI_ACCOUNTS, null);
+		tmp = getSharedPreferences(Constants.ROUTE_PREFERENCE_FILE, 0).getString(Constants.LAST_VTI_ACCOUNTS, null);
 		if(tmp!=null){
-			String[] fields=tmp.split(DELIMITER);
+			String[] fields=tmp.split(Constants.DELIMITER);
 			for(i=0;i<fields.length;i++)
 				vtiAccounts.add(fields[i]);
 		}	
@@ -145,14 +140,16 @@ public class RouteSubscription extends MapActivity {
 		//mapView.setTraffic(true);
 		mapController = mapView.getController();
 		mapController.setZoom(14); // Zoom 1 is world view
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locMgr = new LocManager(context);
 
+		
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		criteria.setAltitudeRequired(false);
-		String bestProvider=locationManager.getBestProvider(criteria, true);
+		String bestProvider=locMgr.getLocationManager().getBestProvider(criteria, true);
 		//Location lastKnownLocation=locationManager.getLastKnownLocation(bestProvider);
-		locationManager.requestLocationUpdates(bestProvider, Constants.MINTIME, Constants.MINDISTANCE, handler);
+		mHandler=new MapUpdateHandler();
+		locMgr.getLocationManager().requestLocationUpdates(bestProvider, Constants.MINTIME, Constants.MINDISTANCE, mHandler);
 
 		priv=(RadioButton) findViewById(R.id.priv);
 		//pub=(RadioButton) findViewById(R.id.pub);
@@ -164,6 +161,10 @@ public class RouteSubscription extends MapActivity {
 		unsubscribeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
+				if(!isOnline()){
+					Toast.makeText(context, Constants.INTERNET_NOT_AVAILABLE, Toast.LENGTH_SHORT).show();
+					return;
+				}
 				unsubscribeLastRoute();
 			}
 		});
@@ -171,33 +172,65 @@ public class RouteSubscription extends MapActivity {
 		subscribeButton = (Button) findViewById(R.id.subscribe);
 		subscribeButton.setOnClickListener(new OnClickListener() {
 			public void onClick(final View v) {
-				String origin=from.getText().toString().trim()+",Chicago";
+				if(!isOnline()){
+					Toast.makeText(context, Constants.INTERNET_NOT_AVAILABLE, Toast.LENGTH_SHORT).show();
+					return;
+				}
+				String origin;
+				String fromText=from.getText().toString().trim();
+				String toText=to.getText().toString().trim();
+				int idx, size;
+				if(!"Current Location".equals(fromText))
+					origin=fromText+",Chicago";
+				else{
+					Location loc=locMgr.getLatestLocation();
+					Log.e(TAG,"LAST LOCATION: "+loc);
+					origin=GeoCoder.reverseGeocode(loc.getLatitude(),loc.getLongitude());
+					if(origin==null){
+						Toast.makeText(context,"Failed to interpret current GPS location.", Toast.LENGTH_LONG);
+						return;
+					}
+				}
 				String dest=to.getText().toString().trim()+",Chicago";
-				int i;
-				ArrayList<String> copy;
 				if(priv.isChecked()){
-					subscribePriRoute(origin, dest);
+					unsubscribeLastRoute();
+					new SubscribePrivateRouteAsyncTask().execute(origin, dest);
+					//subscribePriRoute(origin, dest);
 				}else{
-					subscribeTransitRoute(origin, dest);
+					unsubscribeLastRoute();
+					new SubscribeTransitRouteAsyncTask().execute(origin, dest);
 				}
-				if(fromHistory.size()<HISTORY_SIZE)
-					fromHistory.add(from.getText().toString().trim());
-				else{
-					copy=new ArrayList<String>();
-					for(i=1;i<HISTORY_SIZE;i++)
-						copy.add(fromHistory.get(i));
-					copy.add(from.getText().toString().trim());
-					fromHistory=copy;
+				if(!"Current Location".equals(fromText)){
+					idx=fromHistory.indexOf(fromText);
+					size=fromHistory.size();
+					if(idx>=0){//not a new input
+						fromHistory.remove(idx);
+						fromHistory.add(fromText);
+					}else{//a new input
+						if (size < Constants.HISTORY_SIZE) { //not reach capacity
+							fromHistory.add(fromText);
+						} else {
+							fromHistory.remove(0);
+							fromHistory.add(fromText);
+						}
+					}
 				}
-				if(toHistory.size()<HISTORY_SIZE)
-					toHistory.add(to.getText().toString().trim());
-				else{
-					copy=new ArrayList<String>();
-					for(i=1;i<HISTORY_SIZE;i++)
-						copy.add(fromHistory.get(i));
-					copy.add(to.getText().toString().trim());
-					toHistory=copy;
+				idx=toHistory.indexOf(toText);
+				size=toHistory.size();
+				if(idx>=0){//not a new input
+					toHistory.remove(idx);
+					toHistory.add(toText);
+				}else{//a new input
+					if (size < Constants.HISTORY_SIZE) { //not reach capacity
+						toHistory.add(toText);
+					} else {
+						toHistory.remove(0);
+						toHistory.add(fromText);
+					}
 				}
+				// bind vHandler
+				vHandler=new VTIAccountsUpdateHandler();
+				locMgr.getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MINTIME, Constants.MINDISTANCE, vHandler);
 			}
 		});
 		
@@ -228,28 +261,27 @@ public class RouteSubscription extends MapActivity {
 		});
 	}
 	
-		
 	@Override
     protected void onPause() {
         //remove the listener
-        locationManager.removeUpdates(handler);
+        locMgr.getLocationManager().removeUpdates(mHandler);
         super.onPause();
     }
  
 	@Override
     protected void onResume() {
         //add the listener again
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MINTIME, Constants.MINDISTANCE, handler);
+        locMgr.getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MINTIME, Constants.MINDISTANCE, mHandler);
         super.onResume();
     }
 	
 	@Override
 	protected void onStop(){
-		locationManager.removeUpdates(handler);
+		locMgr.getLocationManager().removeUpdates(mHandler);
 	    super.onStop();
 		// We need an Editor object to make preference changes.
 		// All objects are from android.context.Context
-		SharedPreferences settings = getSharedPreferences(SETTINGS, 0);
+		SharedPreferences settings = getSharedPreferences(Constants.ROUTE_PREFERENCE_FILE, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		StringBuilder write=new StringBuilder();
 		int i;
@@ -258,25 +290,26 @@ public class RouteSubscription extends MapActivity {
 		for(i=0;i<fromHistory.size();i++){
 			write.append(fromHistory.get(i));
 			if(i<fromHistory.size()-1)
-				write.append(DELIMITER);
+				write.append(Constants.DELIMITER);
 		}
-		editor.putString(FROM_HISTORY, write.toString());
+		editor.putString(Constants.FROM_HISTORY, write.toString());
 		//edit toHistory
 		write.delete(0, write.length());
 		for(i=0;i<toHistory.size();i++){
 			write.append(toHistory.get(i));
 			if(i<toHistory.size()-1)
-				write.append(DELIMITER);
+				write.append(Constants.DELIMITER);
 		}
-		editor.putString(TO_HISTORY, write.toString());
+		editor.putString(Constants.TO_HISTORY, write.toString());
 		//edit vti accounts
 		write.delete(0, write.length());
-		for(i=0;i<vtiAccounts.size();i++){
-			write.append(vtiAccounts.get(i));
+		Object[] itr=vtiAccounts.toArray();
+		for(i=0;i<itr.length;i++){
+			write.append(itr[i]);
 			if(i<vtiAccounts.size()-1)
-				write.append(DELIMITER);
+				write.append(Constants.DELIMITER);
 		}
-		editor.putString(LAST_VTI_ACCOUNTS, write.toString());
+		editor.putString(Constants.LAST_VTI_ACCOUNTS, write.toString());
 
 		// Commit the edits!
 		editor.commit();
@@ -284,22 +317,25 @@ public class RouteSubscription extends MapActivity {
 	
 	protected void handleSpinner(final String id){
 		final CharSequence[] items;
-		int i;
+		int i,size;
 		if(id.equals("from")){
-			 items= new CharSequence[fromHistory.size()];
-			 for(i=0;i<items.length;i++)
-					items[i]=fromHistory.get(i);
+			 size=fromHistory.size();
+			 items= new CharSequence[size+1];
+			 items[0]="Current Location";
+			 for(i=1;i<=size;i++)
+					items[i]=fromHistory.get(size-i);
 		}
 		else{
-			items=new CharSequence[toHistory.size()];
-			for(i=0;i<items.length;i++)
-				items[i]=toHistory.get(i);
+			size=toHistory.size();
+			items=new CharSequence[size];
+			for(i=0;i<size;i++)
+				items[i]=toHistory.get(size-i-1);
 		}
 		final String fromText=from.getText().toString();
 		final String toText=to.getText().toString();
 		
 		AlertDialog select=new AlertDialog.Builder(RouteSubscription.this)
-        .setTitle("Please select from last "+HISTORY_SIZE+" inputs")
+        .setTitle("Please select from one of the following")
         .setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
             	Log.e(TAG, "select is "+whichButton);
@@ -337,11 +373,12 @@ public class RouteSubscription extends MapActivity {
 		return vtiAccounts;
 	}
 	
-	protected void showTransitRouteDetail(int id) {
+	private void showTransitRouteDetail(int id) {
+		//TODO: better to make a dynamic view
 		final Dialog dialog=new Dialog(RouteSubscription.this);
 		dialog.setTitle("Route Details");
 		dialog.setContentView(R.layout.transit_route_detail);
-		TextView detailBox=(TextView)dialog.findViewById(R.id.transitRouteDetail); 
+		TextView detailBox=(TextView)dialog.findViewById(R.id.transitRouteDetail);
 		detailBox.setText(transitRoutes.get(id).toString());
 		Button backButton=(Button)dialog.findViewById(R.id.back);
 		backButton.setOnClickListener(new OnClickListener(){
@@ -353,16 +390,13 @@ public class RouteSubscription extends MapActivity {
 	} 
 	
 	protected void unsubscribeLastRoute(){
-		final AccountManager authMgr = twitterManager.getOAuthMgr();
-		if (!authMgr.isAccountEmpty()) {
-			for(String account: vtiAccounts)
-				twitterManager.unfollow(account);
-		}
+		if(vHandler!=null)
+			locMgr.getLocationManager().removeUpdates(vHandler);
+		if(vtiAccounts.size()>0)
+			new UnFollowAsyncTask().execute();
 	}
 	
-	protected boolean subscribeTransitRoute(String origin, String dest){
-		Toast.makeText(context,	WAIT_MESSAGE,Toast.LENGTH_SHORT).show();
-		ArrayList<String> routes = calculateTransitRoutes(origin, dest);
+	private void subscribeTransitRoute(ArrayList<String> routes){
 		if (routes.size() > 0) {
 			transitRoutes=new ArrayList<TransitRoute>();
 			//default choice
@@ -387,12 +421,6 @@ public class RouteSubscription extends MapActivity {
        				// Step 2: draw and subscribe a route
        				Log.e(TAG, "Before draw the pubRoute");
        				drawAndSubscribeTransitRoute(pubRoute, Color.BLUE, mapView);
-       				Toast.makeText(context,
-       						"Successuflly subscribe to route <From = "
-       								+ from.getText().toString()
-       								+ " To = "
-       								+ to.getText().toString() + ">",
-       						Toast.LENGTH_LONG).show();
                  }
             })
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -402,41 +430,30 @@ public class RouteSubscription extends MapActivity {
             })
            .create();
 			select.show();
-			return true;
 		} else{
 			Toast.makeText(context,ROUTE_QUERY_FAILURE,Toast.LENGTH_LONG).show();
-			return false;
 		}
 	}
 
-	protected boolean subscribePriRoute(String origin, String dest) {
-		Toast.makeText(context,	WAIT_MESSAGE,Toast.LENGTH_SHORT).show();
+	private boolean subscribePriRoute(String origin, String dest) {
 		String accountName;
 		if (calculatePriRoute(buildURL(origin,dest,false))) {
 			drawPriRoute(priRoute, Color.BLUE, mapView);
 			for(int i=0;i<priRoute.size();i++){
-				accountName=GeoCoder.reverseGeocode(priRoute.get(i));
-				if(accountName!=null){
-					twitterManager.follow(accountName);
+				accountName=GeoCoder.determineVTIAccount(priRoute.get(i));
+				if(accountName!=null&&!vtiAccounts.contains(accountName)) 
 					vtiAccounts.add(accountName);
-				}
 			}
-			Toast.makeText(context,
-							"Successuflly subscribe to route <From = "
-									+ from.getText().toString()
-									+ " To = "
-									+ to.getText().toString() + ">",
-							Toast.LENGTH_LONG).show();
+			Log.e(TAG,"In subscribePriRoute "+vtiAccounts.toString());
 			return true;
 		} else{
-			Toast.makeText(context,ROUTE_QUERY_FAILURE,Toast.LENGTH_LONG).show();
 			return false;
 		}
 	}
 
 	@Override
 	protected boolean isRouteDisplayed() {
-		return false;
+		return true;
 	}
 	
 	/*
@@ -490,6 +507,7 @@ public class RouteSubscription extends MapActivity {
 		tmp.append("&dirflg=r&ri=0&output=html&date="
 				+ sdfDate.format(now) + "&time="
 				+ sdfTime.format(now).replaceAll(" ", ""));
+		Log.e(TAG, tmp.toString());
 		try {
 			doc = Jsoup.connect(tmp.toString()).get();
 			Element directions = doc.select("p").get(2);
@@ -601,19 +619,42 @@ public class RouteSubscription extends MapActivity {
 				itr.remove();
 			}
 		}
-		
 		// add new rotue over lays
 		mapOverlays.add(new RouteOverLay(originPoint, originPoint, 1, context));
 		ArrayList<Station> stations=route.getTransferStations();
 		GeoPoint stationPoint, lastPoint=originPoint;
+		String zone_id;
 		int mode;
 		for (Station station: stations) {
 			Log.e(TAG,station.getRouteName()+"  "+station.getStationName());
 			if(station.getMode().equals("Subway")){ 			//mode=8 ->train
 				mode=8; 
-				// only subscribe to train station
-				twitterManager.follow(station.getVTIAccount());
-				vtiAccounts.add(station.getVTIAccount());
+				/**
+				 * subscribe to the zone area the station belongs to
+				 */ 
+				/*
+				GeoPoint rp=GeoCoder.geocode(PercentEncode.encode(station.getRouteName()+" "+station.getStationName()+" Chicago"));
+				zone_id=null;
+				if(rp!=null){
+					zone_id=GeoCoder.determineVTIAccount(rp);
+					if(zone_id!=null){
+						twitterMgr.follow(new String[]{zone_id});
+						if(!vtiAccounts.contains(zone_id))
+							vtiAccounts.add(zone_id);
+					}
+				}
+				*/
+				// subscribe to the train station and the train route the station belongs to
+				if(!vtiAccounts.contains(station.getVTIAccount())){
+					vtiAccounts.add(station.getVTIAccount());
+					twitterMgr.follow(new String[]{station.getVTIAccount()});
+					String trainRouteAccountName="vti_"+station.getRouteName().replaceAll(" ","").toLowerCase();
+					if(!vtiAccounts.contains(trainRouteAccountName)){
+						vtiAccounts.add(trainRouteAccountName);
+						twitterMgr.follow(new String[]{trainRouteAccountName});
+					}
+				}
+				Log.e(TAG, station.getRouteName()+"after following the train station account");
 			}
 			else mode=9; //mode=9 -> bus;
 			stationPoint=station.getGeoPoint();
@@ -623,12 +664,12 @@ public class RouteSubscription extends MapActivity {
 				lastPoint=stationPoint;
 			}
 			// follow the station
-
 		}
 		// use the default color
 		mapOverlays.add(new RouteOverLay(lastPoint, destPoint, 2, color, context));
 		mapOverlays.add(new RouteOverLay(destPoint, destPoint, 1, context));
 		mapView.getController().animateTo(originPoint);
+		Toast.makeText(context,"Successuflly subscribe to route <From = "+ from.getText().toString()+ ", To = "+ to.getText().toString() + ">",Toast.LENGTH_LONG).show();
 	}
 
 	private void drawPriRoute(ArrayList<GeoPoint> route, int color, MapView mMapView) {
@@ -642,7 +683,7 @@ public class RouteSubscription extends MapActivity {
 				itr.remove();
 			}
 		}
-		// add new rotue over lays
+		// add new route over lays
 		GeoPoint startGP=route.get(0); 
 		mapOverlays.add(new RouteOverLay(startGP, startGP, 1, context));
 			
@@ -654,28 +695,95 @@ public class RouteSubscription extends MapActivity {
 		mapOverlays.add(new RouteOverLay(route.get(i), route.get(i), 1, context));
 		mapView.getController().animateTo(priRoute.get(0));
 	}
+	
+	private boolean isOnline() {
+	    ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
+	    if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+	        return true;
+	    }
+	    return false;
+	}
+	
+	private class FollowAsyncTask extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected Void doInBackground(final Void... params) {
+			Log.e(TAG, "Follow do in background"+vtiAccounts.toString());
+			twitterMgr.follow(vtiAccounts.toArray(new String[1]));
+			return null;
+		}
+	};
+	
+	private class UnFollowAsyncTask extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected Void doInBackground(final Void... params) {
+			Log.e(TAG, "UnFollow do in background"+vtiAccounts.toString());
+			twitterMgr.unfollow(vtiAccounts.toArray(new String[1]));
+			vtiAccounts.clear();
+			return null;
+		}
+	};
+	
+	private class SubscribePrivateRouteAsyncTask extends AsyncTask<String, Void, Boolean> {
+		private ProgressDialog dialog = new ProgressDialog(RouteSubscription.this);
 
-	public class GeoUpdateHandler implements LocationListener {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			dialog.setMessage(WAIT_MESSAGE);
+			dialog.show();
+		}
+		
+		@Override
+		protected Boolean doInBackground(final String... params) {
+			return subscribePriRoute(params[0], params[1]);
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean success){
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+			if(success){
+				new FollowAsyncTask().execute();
+				Toast.makeText(context,"Successuflly subscribe to route <From = "+ from.getText().toString()+ ", To = "+ to.getText().toString() + ">",Toast.LENGTH_LONG).show();
+			}
+			else
+				Toast.makeText(context,ROUTE_QUERY_FAILURE,Toast.LENGTH_LONG).show();
+		}
+	};
+	
+	private class SubscribeTransitRouteAsyncTask extends AsyncTask<String, Void, ArrayList<String>> {
+		private ProgressDialog dialog = new ProgressDialog(RouteSubscription.this);
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			dialog.setMessage(WAIT_MESSAGE);
+			dialog.show();
+		}
+		
+		@Override
+		protected ArrayList<String> doInBackground(final String... params) {
+			return calculateTransitRoutes(params[0], params[1]);
+		}
+		
+		@Override
+		protected void onPostExecute(ArrayList<String> routes){
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+			subscribeTransitRoute(routes);
+		}
+	};
+
+	private class MapUpdateHandler implements LocationListener {
 		@Override
 		public void onLocationChanged(Location location) {
-			Log.e(TAG, "onLocationChanged with location " + location.toString());
+			Log.e(TAG, "Within MapUpdatehanlder onLocationChanged: " + location.toString());
 			int lat = (int) (location.getLatitude() * 1E6);
 			int lng = (int) (location.getLongitude() * 1E6);
 			GeoPoint point = new GeoPoint(lat, lng);
 			mapController.animateTo(point); // mapController.setCenter(point);
-			
-			/*
-			List<Address> addresses;
-			try {
-				addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 10);
-				for (Address address : addresses) {
-					Log.e(TAG, address.getAddressLine(0));
-				}
-			} catch (IOException e) {
-				Log.e("LocateMe", "Could not get Geocoder data", e);
-				e.printStackTrace();
-			} 
-			*/
 
 			//add a location overlay and remove the old location overlay
 			List<Overlay> mapOverlays=mapView.getOverlays();
@@ -700,7 +808,46 @@ public class RouteSubscription extends MapActivity {
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
 	}
+	
+	private class VTIAccountsUpdateHandler implements LocationListener {
+		private int count;
+		public VTIAccountsUpdateHandler(){
+			count=0;
+		}
+		
+		@Override
+		public void onLocationChanged(Location location) {
+			Log.e(TAG, "Within VTIAccountUpdatehanlder onLocationChanged: " + location.toString());
+			String account=GeoCoder.determineVTIAccount(new GeoPoint((int)(location.getLatitude()*1.0E6),(int)(location.getLongitude()*1.0E6)));
+			int idx=vtiAccounts.indexOf(account);
+			//current Twitter account is not the first one in the VTIAccounts
+			//unfollow the previous account, e.g. given vtiAccounts=<zone_35, zone_36>, once I am in zone_36, unfollow zone_35.
+			if(idx>0){
+				count++;
+				if(count==3){// need at least 3 consecutive gps report within the same zone to assure the position 
+					for(int i=0;i<idx;i++)
+						twitterMgr.unfollow(new String[]{vtiAccounts.remove(0)});
+					Log.e(TAG,"Unfollow account");
+					count=0;
+				}
+			}else
+				count=0;
+		}
+
+		@Override
+		public void onProviderDisabled(String provider) {
+		}
+
+		@Override
+		public void onProviderEnabled(String provider) {
+		}
+
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+		}
+	}
 }
+
 
 class RouteOverLay extends Overlay {
 	private GeoPoint gp1;
@@ -804,7 +951,7 @@ class LocationOverlay extends Overlay {
 		paint.setStrokeWidth(5);
 		paint.setARGB(255, 255, 255, 255);
 		paint.setStyle(Paint.Style.STROKE);
-		Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.placemark);
+		Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.current_location);
 		canvas.drawBitmap(bmp, myScreenCoords.x, myScreenCoords.y, paint);
 		//canvas.drawText("Here I am...", myScreenCoords.x, myScreenCoords.y, paint);
 		return true;

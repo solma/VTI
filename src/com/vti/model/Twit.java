@@ -16,13 +16,10 @@ package com.vti.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * @author rohit
- * 
- */
 public class Twit implements Parcelable {
 
 	private long twitId;
+	private long timestamp;
 	private String imageUrl;
 	private String profileName;
 	private String twitMessage;
@@ -51,9 +48,10 @@ public class Twit implements Parcelable {
 	 * @param profileName
 	 * @param twitMessage
 	 */
-	public Twit(long twitId,String profileName, String imageUrl, String twitMessage) {
+	public Twit(long twitId,long timestamp, String profileName, String imageUrl, String twitMessage) {
 		super();
 		this.twitId=twitId;
+		this.timestamp=timestamp;
 		this.imageUrl = imageUrl;
 		this.profileName = profileName;
 		this.twitMessage = twitMessage;
@@ -89,50 +87,37 @@ public class Twit implements Parcelable {
 		downThumbs++;
 	}
 		
-	/**
-	 * @return the twitId
-	 */
 	public long getTwitId() {
 		return twitId;
 	}
+	
+	public long getTimestamp() {
+		return timestamp;
+	}
 
-	/**
-	 * @return the imageUrl
-	 */
 	public String getImageUrl() {
 		return imageUrl;
 	}
 
-	/**
-	 * @return the profileName
-	 */
 	public String getProfileName() {
 		return profileName;
 	}
 
-	/**
-	 * @return the twitMessage
-	 */
 	public String getTwitMessage() {
 		return twitMessage;
 	}
 	
-	/**
-	 * @return # of up thumbs
-	 */
 	public long getUpThumbs() {
 		return upThumbs;
 	}
-	
-	/**
-	 * @return # of down thumbs
-	 */
+
 	public long getDownThumbs() {
 		return downThumbs;
 	}
 
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeLong(twitId);
+		out.writeLong(timestamp);
 		out.writeString(imageUrl);
 		out.writeString(profileName);
 		out.writeString(twitMessage);
@@ -144,6 +129,7 @@ public class Twit implements Parcelable {
 
 	public void readFromParcel(Parcel in) {
 		this.twitId = in.readLong();
+		this.timestamp=in.readLong();
 		this.imageUrl = in.readString();
 		this.profileName = in.readString();
 		this.profileName = in.readString();

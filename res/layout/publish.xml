@@ -13,9 +13,7 @@
 		<Button android:id="@+id/publish" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:layout_weight="1"
 			android:text="@string/publish"></Button>
-		<ImageButton android:id="@+id/speak" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:background="@drawable/speak" 
-			android:layout_weight="1"></ImageButton>
+
 		<Button android:id="@+id/cancel_button" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:layout_weight="1"
 			android:text="@string/cancel"></Button>

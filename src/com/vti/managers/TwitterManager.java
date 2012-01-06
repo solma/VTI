@@ -12,21 +12,36 @@
  */
 package com.vti.managers;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import twitter4j.GeoLocation;
+import twitter4j.IDs;
+import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import twitter4j.User;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.vti.Constants;
 import com.vti.model.Twit;
+import com.vti.utils.PercentEncode;
 
 public class TwitterManager {
 	private static final String TAG = TwitterManager.class.getSimpleName();
@@ -83,7 +98,7 @@ public class TwitterManager {
 	}
 
 	/**
-	 * Get Twitter feed
+	 * Get homeline of the user
 	 * 
 	 * @return List<Twits>
 	 */
@@ -96,10 +111,9 @@ public class TwitterManager {
 
 			for (Status status : statues) {
 				// only return tweets from VTI accounts
-				if (status.getUser().getName().startsWith("vti_")) {
-					Log.d(TwitterManager.class.getSimpleName(), status.getUser()
-							.getName() + "  " + status.getText());
-					twits.add(new Twit(status.getId(), status.getUser()
+				if (status.getUser().getName().toLowerCase().startsWith("vti_")) {
+					//Log.d(TwitterManager.class.getSimpleName(), status.getUser().getName() + "  " + status.getText());
+					twits.add(new Twit(status.getId(),  status.getCreatedAt().getTime(), status.getUser()
 							.getName(), status.getUser().getProfileImageURL()
 							.toString(), status.getText()));
 				}
@@ -109,6 +123,29 @@ public class TwitterManager {
 		}
 		return twits;
 
+	}
+	
+	/**
+	 * Get timeline of  a specified user
+	 * 
+	 * @return List<Twits>
+	 */
+	public List<Twit> getUserTimeline(String userName) {
+		List<Twit> twits = null;
+		try {
+			// User user = twitter.verifyCredentials();
+			final List<Status> statues = twitter.getUserTimeline(userName);
+			twits = new ArrayList<Twit>(statues.size());
+			for (Status status : statues) {
+					Log.e(TAG, status.getText());
+					twits.add(new Twit(status.getId(), status.getCreatedAt().getTime(), status.getUser()
+							.getName(), status.getUser().getProfileImageURL()
+							.toString(), status.getText()));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return twits;
 	}
 
 	/**
@@ -131,31 +168,115 @@ public class TwitterManager {
 	 * 
 	 * @param accounts
 	 */
-	public void follow(final String accounts) {
-		try {
-			String[] ats = accounts.split(";");
-			for (String s : ats)
-				twitter.createFriendship(s.trim(), true);
-		} catch (TwitterException e) {
-			Log.e(TAG, "cannot follow the account, something wrong");
-			e.printStackTrace();
-		}
+	public void follow(final String[] accounts) {
+		if(accounts!=null)
+			for (int i = 0; i < accounts.length; i++) {
+				try {
+					twitter.createFriendship(accounts[i].trim(), true);
+				} catch (TwitterException e) {
+					Log.e(TAG, "cannot follow the account: " + accounts[i]);
+					//e.printStackTrace();
+					continue;
+				}
+			}
 	}
 
 	/**
 	 * unfollow accounts on twitter
 	 * 
+	 * @param 
+	 */
+	public void unfollow(final String[] accounts) {
+		if(accounts!=null)
+			for (int i = 0; i < accounts.length; i++) {
+				try {
+					Log.e(TAG,accounts[i]);
+					twitter.destroyFriendship(accounts[i].trim());
+				} catch (TwitterException e) {
+					Log.e(TAG, "cannot unfollow the account: " + accounts[i]);
+					//e.printStackTrace();
+					continue;
+				}
+			}
+	}
+	
+	/**
+	 * return all current following accounts
+	 * 
 	 * @param accounts
 	 */
-	public void unfollow(final String accounts) {
+	public String[] getFriends(){
 		try {
-			String[] ats = accounts.split(";");
-			for (String s : ats)
-				twitter.destroyFriendship(s.trim());
-
+			ArrayList<String> vti_accounts=new ArrayList<String>();
+			long[] ids=twitter.getFriendsIDs(-1).getIDs();
+			ResponseList<User> users=twitter.lookupUsers(ids);
+			String name;
+			if(users!=null&&users.size()>0){
+				for (int i = 0; i < users.size(); i++){
+					name = users.get(i).getScreenName();
+					if(name.toLowerCase().startsWith("vti_")){
+						vti_accounts.add(name);
+					}
+				}
+				return vti_accounts.toArray(new String[vti_accounts.size()]);
+			}
 		} catch (TwitterException e) {
-			Log.e(TAG, "cannot unfollow the account, something wrong");
+			Log.e(TAG, "cannot get Frindliest");
 			e.printStackTrace();
 		}
+		return null;
 	}
+	
+	/**
+	 * return all existing VTI accounts
+	 * 
+	 * @param accounts
+	 */
+	public HashMap<String, String> getAllVTIAccounts(){
+		HashMap<String,String> ret=new HashMap<String,String>();
+		try {
+			Document doc;
+			int i,j;
+			doc = Jsoup.connect(Constants.ACCOUNTS_LIST).get();
+			org.jsoup.select.Elements accounts = doc.select("account");
+			StringBuilder details=new StringBuilder();
+			for(i=0;i<accounts.size();i++) {
+				details.delete(0, details.length());
+				org.jsoup.select.Elements childrenEles=accounts.get(i).children();
+				for(j=0;j<childrenEles.size();j++){
+					String tagName=childrenEles.get(j).tagName();
+					if(tagName.equals("southwest")||tagName.equals("northeast")){
+						String coords=childrenEles.get(j).select("lat").text()+" , "+childrenEles.get(j).select("lng").text();
+						details.append(tagName+" : "+coords+"\n");
+					}
+					else
+						details.append(tagName+" : "+childrenEles.get(j).text()+"\n");
+				}
+				ret.put(childrenEles.get(0).text(), details.toString());
+			}
+		} catch (Exception e) {
+			Log.e(TAG, "cannot parse the accounts list file");
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	/**
+	 * return all VTI accounts that are not currently followed
+	 * 
+	 * @param accounts
+	 */
+	public HashMap<String, String> getUnfollowedVTIAccounts(){
+		HashMap<String, String> allAccounts=getAllVTIAccounts();
+		String [] friends=getFriends();
+		if(allAccounts.size()==0)
+			return null;
+		if(friends==null||friends.length<1)
+			return allAccounts;
+		else{
+			for(int i=0;i<friends.length;i++)
+				allAccounts.remove(friends[i]);
+			return allAccounts;
+		}
+	} 
 }

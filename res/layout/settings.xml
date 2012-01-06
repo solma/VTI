@@ -17,11 +17,21 @@
 			</TableRow>
 			<TableRow android:layout_width="fill_parent"
 				android:layout_height="wrap_content">
-				<TextView android:text="Select Refresh Interval"
+				<TextView android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:text="Voice Notification"></TextView>
+
+				<ToggleButton android:id="@+id/voice_notify"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:layout_gravity="right"
+				></ToggleButton>
+			</TableRow>
+			<TableRow android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+				<TextView android:text="Refresh Frequency (in minutes)"
 					android:id="@+id/textView1" android:layout_width="fill_parent"
 					android:layout_height="wrap_content"></TextView>
 				<EditText android:id="@+id/refresh_rates"
-					android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="1"></EditText>
+					android:layout_width="fill_parent" android:layout_height="wrap_content"></EditText>
 			</TableRow>
 			<TableRow android:layout_width="fill_parent"
 				android:layout_height="wrap_content">

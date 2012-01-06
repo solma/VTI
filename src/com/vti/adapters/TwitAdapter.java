@@ -13,9 +13,7 @@
  */
 package com.vti.adapters;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -23,12 +21,9 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Scanner;
 
 import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.ConfigurationBuilder;
+import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,6 +31,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,10 +39,12 @@ import android.widget.Toast;
 
 import com.vti.Constants;
 import com.vti.R;
+import com.vti.SocialFeed;
 import com.vti.managers.AccountManager;
 import com.vti.managers.DrawableManager;
-import com.vti.managers.TwitterManager;
 import com.vti.model.Twit;
+import com.vti.utils.CustomEventHandler;
+import com.vti.utils.CustomEventListener;
 
 /**
  * @author (sg)
@@ -60,16 +58,17 @@ public class TwitAdapter extends BaseAdapter {
 	private Twitter twitter;
 	private String voterName;
 	private DrawableManager drawableManager = new DrawableManager();
-
+	private CustomEventListener callback;
 	/**
 	 * @param context
 	 * @param textViewResourceId
 	 * @param objects
 	 */
-	public TwitAdapter(final Context context, List<Twit> socialFeed) {
+	public TwitAdapter(final Context context, List<Twit> socialFeed, CustomEventListener callback) {
 		super();
 		this.socialFeed = socialFeed;
 		this.context = context;
+		this.callback=callback;
 		
 		AccountManager authMgr = new AccountManager(context);
 		if (!authMgr.isAccountEmpty()){
@@ -105,16 +104,28 @@ public class TwitAdapter extends BaseAdapter {
 		final ImageView profileImage = (ImageView) row
 				.findViewById(R.id.profileImage);
 		drawableManager.fetchDrawableOnThread(twit.getImageUrl(), profileImage);
-
+	
 		final TextView profileName = (TextView) row
 				.findViewById(R.id.profileName);
 		profileName.setText(twit.getProfileName());
 		//Log.d(TAG, "Profile name= " + twit.getProfileName() + " Message= "+ twit.getTwitMessage());
 
-		final TextView twitMessage = (TextView) row
-				.findViewById(R.id.twitMessage);
+		final TextView twitMessage = (TextView) row.findViewById(R.id.twitMessage);
 		twitMessage.setText(twit.getTwitMessage());
-
+		
+		final TextView timestamp=(TextView) row.findViewById(R.id.time);
+		timestamp.setText(calLatency(twit.getTimestamp()));
+		
+		final ImageButton editPublishButton = (ImageButton) row
+				.findViewById(R.id.retweet);
+		editPublishButton.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(final View v){
+				callback.onCustomLongClick(v, twit.getTwitMessage());
+			}
+		});
+		
+		row.setOnLongClickListener(new CustomEventHandler(callback,position,twit.getTwitMessage()));
 		// set up/down Thumbs button visible
 		final ImageButton upThumbs_button = (ImageButton) row
 				.findViewById(R.id.upThumbsPic);
@@ -125,8 +136,7 @@ public class TwitAdapter extends BaseAdapter {
 
 		final TextView upThumbs = (TextView) row.findViewById(R.id.upThumbsNum);
 		//upThumbs.setText(Long.toString(twit.getUpThumbs()));
-		final TextView downThumbs = (TextView) row
-				.findViewById(R.id.downThumbsNum);
+		final TextView downThumbs = (TextView) row.findViewById(R.id.downThumbsNum);
 		//upThumbs.setText(Long.toString(twit.getDownThumbs()));
 
 		// update the # of upThumb votes and the # of downThumb votes
@@ -139,7 +149,7 @@ public class TwitAdapter extends BaseAdapter {
 				//BufferedReader in = null;
 				Socket clientSocket = new Socket();
 				if(twit.getAlreadyVotedUp())
-					Toast.makeText(context, Constants.REPEAT_VOTE, Toast.LENGTH_SHORT );
+					Toast.makeText(context, Constants.REPEAT_VOTE, Toast.LENGTH_SHORT ).show();
 				else{
 					try {
 						addr = InetAddress.getByName(Constants.SERVER_IP);
@@ -171,7 +181,7 @@ public class TwitAdapter extends BaseAdapter {
 						 */
 						//while (in.readLine() != null);
 						//Log.e(TAG, "After readLine.");
-						out.print(twit.getTwitId() + "," + voterName + ",up");
+						out.print(twit.getTwitMessage() + "," + voterName + ",up");
 						out.close();
 						clientSocket.close();
 						twit.increaseUpThumbs();
@@ -194,7 +204,7 @@ public class TwitAdapter extends BaseAdapter {
 				//BufferedReader in = null;
 				Socket clientSocket = new Socket();
 				if(twit.getAlreadyVotedDown())
-					Toast.makeText(context, Constants.REPEAT_VOTE,Toast.LENGTH_SHORT );
+					Toast.makeText(context, Constants.REPEAT_VOTE,Toast.LENGTH_SHORT ).show();
 				else{
 					try {
 						addr = InetAddress.getByName(Constants.SERVER_IP);
@@ -217,15 +227,7 @@ public class TwitAdapter extends BaseAdapter {
 					try {
 						out = new PrintWriter(clientSocket.getOutputStream(),
 								true);
-						//in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-						/**
-						 * Integer timeout in milliseconds for blocking accept
-						 * or read/receive operations (but not write/send
-						 * operations). A timeout of 0 means no timeout.
-						 */
-						//while (in.readLine() != null);
-						//Log.e(TAG, "After readLine.");
-						out.print(twit.getTwitId() + "," + voterName + ",down");
+						out.print(twit.getTwitMessage() + "," + voterName + ",down");
 						out.close();
 						clientSocket.close();
 						twit.increaseDownThumbs();
@@ -242,32 +244,29 @@ public class TwitAdapter extends BaseAdapter {
 		return row;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.widget.Adapter#getCount()
-	 */
+	private String calLatency(long time){
+		long diff=(int)((System.currentTimeMillis()-time)/Constants.ONE_MINUTE); //difference in minutes
+		int days, hours, minutes;
+		days=(int)(diff/60/24);
+		hours=(int)((diff-days*60*24)/60);
+		minutes=(int)diff%60;
+		if(days>0)
+			return days+" days "+hours+" hours "+minutes+" minutes ago";
+		else
+			if(hours>0)
+				return hours+" hours "+minutes+" minutes ago";
+			else
+				return minutes+" minutes ago";
+	}
 
 	public int getCount() {
 		return socialFeed.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.widget.Adapter#getItem(int)
-	 */
-
 	public Object getItem(final int index) {
 
 		return socialFeed.get(index);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.widget.Adapter#getItemId(int)
-	 */
 
 	public long getItemId(final int index) {
 		return index;

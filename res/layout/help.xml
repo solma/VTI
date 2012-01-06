@@ -21,11 +21,18 @@
         </TextView>
     </RelativeLayout>
 
-    <TextView
+    <ScrollView  
+        android:id="@+id/scroller"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:fillViewport="true">
+     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#101010"
-        android:text="Help:qweqeqe" >
+        android:text="VTI (Volunteered Traveler Information) is a twitter application that dedicates to real-time transportation information. Users can publish transportation information to Twitter and also subscribe such information from Twitter via VTI.\n\nYou can publish transportation information by\n(i). clicking the 'publish' button\n(ii). editing a received notification by clicking its associated 'retweet' button or pressing it for 1 sec.\n\nYou can subscribe transportation information by\n(i). clikcing the 'follow/unfollow' or 'unfollow by select' buttons to directly follow/unfollow specified Twitter accounts that governed by VTI (each VTI Twitter account corresponds to an geographical area such that all transportation information within the area that are posted to Twitter via VTI is reposted by the account)\n(ii). click the 'route' button to define a customized route and subscribe the route. Note that at any time only one route can be subscribed. Subscribe to a new route will automatically unsubscribe last route if it has not been unsubscribed.\n\nFor any received notificaiton, you can 'thumb' it up or down. This will help VTI filter inaccurate and falsified information and improve notification data quality.\n\nVTI mainly relies on user generated data. Therefore the more people use it, the more useful it becomes. So any activity/idea that help promote the application is extremely welcome.   
+        " >
     </TextView>
+    </ScrollView>
 
 </LinearLayout>

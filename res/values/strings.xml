@@ -19,9 +19,6 @@
 	
 	<string name="follow">Follow</string>
 	<string name="unfollow">UnFollow</string>
-	
-	
-	<string name="about_us_txt">VTI is a crowd-sourcing real-tie traveler information pub/sub application implemented by Sol Ma. </string>
 	<string name="route">Route</string>
 	<string name="map_api_key">08aJscbbtIL1_gdkwk1rE2a03Tqi80IqWLO4nxQ</string>
 	<string name="from">From</string>

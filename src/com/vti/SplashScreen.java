@@ -43,8 +43,6 @@ public class SplashScreen extends Activity {
 	private ImageButton twitterButton;
 	private AccountManager accMgr;
 
-		
-
 	/**
 	 * Called when the activity is first created. Here we will setup oAuth
 	 * related implementations.
@@ -56,16 +54,12 @@ public class SplashScreen extends Activity {
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.main);
-			twitterButton = (ImageButton) findViewById(R.id.twitter);
+			twitterButton = (ImageButton) findViewById(R.id.vti);
 			createAuthorizationRequests(twitterButton);
 			
 			accMgr = new AccountManager(getApplicationContext());
-			//FIXME - This is not the right place to set the alarm. We should have a broad cast receiver which listens for Phone Boot Event.
-			// When the phone boots we should set the alarm manager.
-			//FIXME - In the same broadcast receiver we should register our broadcast receiver to listen to battery levels and register another 
-			// broadcast receiver there. That broadcast receiver will shut down or restart Alarm Manager depending on the battery condition.
-			// These changes will be coming soon.......
-			//setAlarm();
+
+			setAlarm();
 			if (accMgr.isAccountEmpty()) {
 				twitterButton.setVisibility(View.VISIBLE);
 				Log.d(TAG,"not authorized yet");
@@ -143,7 +137,7 @@ public class SplashScreen extends Activity {
 	protected void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
 		try {
-			saveAccessToken(intent);
+			saveAccountInfo(intent);
 			navigateToSocialFeed();
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -165,7 +159,7 @@ public class SplashScreen extends Activity {
 	 * @param intent
 	 * @throws Exception
 	 */
-	private void saveAccessToken(final Intent intent) throws Exception {
+	private void saveAccountInfo(final Intent intent) throws Exception {
 
 		Log.e(TAG, "Fetching access token ...");
 		final Uri uri = intent.getData();
@@ -179,8 +173,10 @@ public class SplashScreen extends Activity {
 	
 			Log.e(TAG, "Access token: " + accessToken.getToken());
 			Log.e(TAG, "Token secret: " + accessToken.getTokenSecret());
-			
+			//save access token and secret
 			accMgr.saveAccount(accessToken.getToken(), accessToken.getTokenSecret());
+			//save update frequency and voice notify preference
+			accMgr.saveSettings(1, true);
 		}
 
 	}

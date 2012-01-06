@@ -6,13 +6,13 @@
 
     <TextView
         android:id="@+id/profileName"
-        android:layout_width="120dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="Profile Name"
         android:textColor="#FF0000"
         android:textSize="13sp" >
     </TextView>
-
+    
     <ImageView
         android:id="@+id/profileImage"
         android:layout_width="100dp"
@@ -22,17 +22,29 @@
         android:padding="10dp"
         android:src="@drawable/placeholder_icon" >
     </ImageView>
-
+    
     <TextView
         android:id="@+id/twitMessage"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/profileName"
+        android:layout_toRightOf="@id/profileImage"
+        android:layout_alignTop="@id/profileImage"
         android:minLines="4"
         android:paddingTop="10dp"
         android:textSize="13sp" >
     </TextView>
+    
 
+    <TextView android:id="@+id/time"
+       		android:layout_width="wrap_content"
+       		android:layout_height="wrap_content"
+       		android:text="0 days 0 hours 0 minutes ago"
+       		android:layout_alignRight="@id/twitMessage"
+       		android:textSize="13sp"
+       		android:textColor="#F5BD64"
+    >
+    </TextView>
+    
     <TextView
         android:id="@+id/downThumbsNum"
         android:layout_width="wrap_content"
@@ -60,6 +72,16 @@
         android:layout_toLeftOf="@+id/downThumbsPic"
         android:layout_marginRight="15dp"
         android:background="@drawable/thumb_up_button" />
+    
+     <ImageButton
+        android:id="@+id/retweet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/twitMessage"
+        android:layout_alignLeft="@id/twitMessage"
+        android:layout_alignBottom="@id/downThumbsPic"
+        android:background="@drawable/retweet" >
+    </ImageButton>
 
     <TextView
         android:id="@+id/upThumbsNum"

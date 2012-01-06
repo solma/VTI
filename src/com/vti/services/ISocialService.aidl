@@ -21,6 +21,7 @@ interface ISocialService {
 	List<Twit> getFromDB();
 	
 	List<Twit> getFromServer();
-
+	
+	List<Twit> getFromEncounteredAccount(String userName);
    
 }

@@ -19,11 +19,6 @@ import android.content.Intent;
 
 import com.vti.services.SocialServiceImpl;
 
-/**
- * @author rohit
- * 
- */
-
 public class AlarmReceiver extends BroadcastReceiver {
 
 	@Override

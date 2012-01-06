@@ -11,6 +11,6 @@
 		</TextView>
 	</RelativeLayout>
 	<TextView android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:text="@string/about_us_txt"
+		android:layout_height="wrap_content" android:text="VTI is developed and currently maintained by Sol Ma, a graduate student from University of Illinois at Chicago. For comments/questions regarding VTI, please write feedbacks or contact us at: sma21@uic.edu."
 		android:background="#101010"></TextView>
 </LinearLayout>

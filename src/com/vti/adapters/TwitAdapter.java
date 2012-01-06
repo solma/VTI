@@ -25,7 +25,7 @@ import java.util.List;
 import twitter4j.Twitter;
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
+import com.vti.utils.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -79,7 +79,7 @@ public class TwitAdapter extends BaseAdapter {
 			Log.d(TAG, twitter.getOAuthAccessToken().toString());
 			Log.d(TAG, voterName);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 		} 
 	}
 
@@ -189,7 +189,7 @@ public class TwitAdapter extends BaseAdapter {
 						twit.setAlreadyVotedUp();
 						Toast.makeText(context, Constants.VOTE_SUCCESS,	Toast.LENGTH_SHORT).show();
 					} catch (IOException e) {
-						e.printStackTrace();
+						Log.d(TAG, Log.stack2string(e));
 					}
 				}
 			}
@@ -235,7 +235,7 @@ public class TwitAdapter extends BaseAdapter {
 						twit.setAlreadyVotedDown();
 						Toast.makeText(context, Constants.VOTE_SUCCESS,	Toast.LENGTH_SHORT).show();
 					} catch (IOException e) {
-						e.printStackTrace();
+						Log.d(TAG, Log.stack2string(e));
 					}
 				}
 			}

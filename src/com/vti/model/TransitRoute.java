@@ -2,8 +2,6 @@ package com.vti.model;
 
 import java.util.ArrayList;
 
-import com.google.android.maps.GeoPoint;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 

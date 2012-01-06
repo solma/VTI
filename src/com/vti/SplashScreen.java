@@ -25,7 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import com.vti.utils.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -69,10 +69,10 @@ public class SplashScreen extends Activity {
 				navigateToSocialFeed();
 				Log.d(TAG,accMgr.getAuthTokens().toString());
 			}
-		} catch (Exception ex) {
+		} catch (Exception e) {
 			//To ensure application does not crash
-			ex.printStackTrace();
-			Log.e(SplashScreen.class.getSimpleName(),"Caught exception in SplashScreen.onCreate() "+ex.getMessage());
+			Log.d(TAG, Log.stack2string(e));
+			Log.e(SplashScreen.class.getSimpleName(),"Caught exception in SplashScreen.onCreate() "+e.getMessage());
 		}
 	}
 
@@ -122,7 +122,7 @@ public class SplashScreen extends Activity {
 					Log.d(TAG, authUrl);
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(authUrl)));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Log.d(TAG, Log.stack2string(e));
 					Log.d(TAG ,	"Caught exception in createAuthorizationRequests"	+ e.getMessage());
 				}
 			}
@@ -140,7 +140,7 @@ public class SplashScreen extends Activity {
 			saveAccountInfo(intent);
 			navigateToSocialFeed();
 		} catch (final Exception e) {
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 		}
 	}
 

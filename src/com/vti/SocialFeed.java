@@ -27,7 +27,6 @@ import java.util.Locale;
 
 import twitter4j.GeoLocation;
 import twitter4j.Twitter;
-import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -39,10 +38,10 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -53,14 +52,11 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -80,6 +76,7 @@ import com.vti.services.ISocialService;
 import com.vti.services.SocialServiceImpl;
 import com.vti.utils.CustomEventListener;
 import com.vti.utils.GeoCoder;
+import com.vti.utils.Log;
 
 public class SocialFeed extends ListActivity implements CustomEventListener, TextToSpeech.OnInitListener{
 	private static final String TAG = SocialFeed.class.getSimpleName();
@@ -182,7 +179,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 				try {
 					result = socialService.getFromServer();
 				} catch (final RemoteException e) {
-					e.printStackTrace();
+					Log.d(TAG, Log.stack2string(e));
 				}
 			}
 			return result;
@@ -211,7 +208,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 				try {
 					result = socialService.getFromEncounteredAccount(params[0]);
 				} catch (final RemoteException e) {
-					e.printStackTrace();
+					Log.d(TAG, Log.stack2string(e));
 				}
 			}
 			return result;
@@ -712,7 +709,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 							out.println(twitter.getScreenName());
 						} catch (Exception e) {
 							out.println("anonymous");
-							e.printStackTrace();
+							Log.d(TAG, Log.stack2string(e));
 						}
 					else
 						out.println("anonymous");
@@ -721,7 +718,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 					clientSocket.close();
 					Toast.makeText(getApplicationContext(),"Successfully sent feedback.", Toast.LENGTH_SHORT).show();
 				} catch (IOException e) {
-					e.printStackTrace();
+					Log.d(TAG, Log.stack2string(e));
 				}
 			}
 		});

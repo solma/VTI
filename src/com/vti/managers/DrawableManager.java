@@ -26,7 +26,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import com.vti.services.SocialServiceImpl;
 
 import android.graphics.drawable.Drawable;
-import android.util.Log;
+import com.vti.utils.Log;
 import android.widget.ImageView;
 
 public class DrawableManager {
@@ -49,7 +49,7 @@ public class DrawableManager {
 			return drawable;
 		} catch (Exception e) {
 			Log.e(TAG, "*************   fetchDrawable() -> " + urlString
-					+ " fetchDrawable failed", e);
+					+ " fetchDrawable failed");
 			return null;
 		}
 	}

@@ -28,7 +28,7 @@ import android.database.Cursor;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
+import com.vti.utils.Log;
 
 import com.vti.Constants;
 import com.vti.R;
@@ -171,7 +171,7 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 			try {
 				updateFeeds();
 			} catch (final RemoteException e) {
-				e.printStackTrace();
+				Log.d(TAG, Log.stack2string(e));
 			}
 		}
 		return START_STICKY;

@@ -16,7 +16,7 @@ package com.vti.managers;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+import com.vti.utils.Log;
 class FlushedInputStream extends FilterInputStream {
 
 	/**

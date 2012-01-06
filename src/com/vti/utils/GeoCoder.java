@@ -6,7 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import android.util.Log;
+import com.vti.utils.Log;
 
 import com.google.android.maps.GeoPoint;
 import com.vti.Constants;
@@ -30,7 +30,7 @@ public class GeoCoder {
 			else
 				return null;
 			} catch (IOException e) {
-			e.printStackTrace();
+				Log.d(TAG, Log.stack2string(e));
 		}
 		return null;
 	}
@@ -47,8 +47,8 @@ public class GeoCoder {
 				address=doc.select("result > formatted_address").first().text();
 				Log.e(TAG, address);
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception e) {
+			Log.d(TAG, Log.stack2string(e));
 		}
 		return address;
 	}

@@ -21,10 +21,11 @@ import twitter4j.conf.ConfigurationBuilder;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-
+import com.vti.utils.Log;
 import com.vti.Constants;
 
 public class AccountManager {
+	private static final String TAG=AccountManager.class.getSimpleName();
 	private TwitterFactory tf;
 
 	private Context context;
@@ -69,7 +70,7 @@ public class AccountManager {
 			try {
 				return twitter.getOAuthAccessToken();
 			} catch (TwitterException e) {
-				e.printStackTrace();
+				Log.d(TAG, Log.stack2string(e));
 				return null;
 			}
 		} else

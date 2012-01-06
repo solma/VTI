@@ -8,7 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
+import com.vti.utils.Log;
 
 public class LocManager {
 	private static final String TAG=LocManager.class.getSimpleName();

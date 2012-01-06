@@ -37,7 +37,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import com.vti.utils.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -526,7 +526,7 @@ public class RouteSubscription extends MapActivity {
 					routeTravelTime.add(steps[i].trim());
 			}
 		}catch (IOException e) {
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 		}
 		// save the first route
 		StringBuilder firstRoute=new StringBuilder(route);
@@ -558,7 +558,7 @@ public class RouteSubscription extends MapActivity {
 					routes.add(steps[j+1].trim()+"\n"+firstRoute.toString());
 				routes.add(routeTravelTime.get(i-1)+"\n"+route.toString());
 			} catch (IOException e) {
-				e.printStackTrace();
+				Log.d(TAG, Log.stack2string(e));
 			}
 		}
 		return routes;
@@ -601,7 +601,7 @@ public class RouteSubscription extends MapActivity {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 			return false;
 		}
 		return true;

@@ -12,21 +12,14 @@
  */
 package com.vti.managers;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import twitter4j.GeoLocation;
-import twitter4j.IDs;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
@@ -36,12 +29,10 @@ import twitter4j.User;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.vti.Constants;
 import com.vti.model.Twit;
-import com.vti.utils.PercentEncode;
+import com.vti.utils.Log;
 
 public class TwitterManager {
 	private static final String TAG = TwitterManager.class.getSimpleName();
@@ -119,7 +110,7 @@ public class TwitterManager {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 		}
 		return twits;
 
@@ -143,7 +134,7 @@ public class TwitterManager {
 							.toString(), status.getText()));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 		}
 		return twits;
 	}
@@ -159,7 +150,7 @@ public class TwitterManager {
 			status.setLocation(loc);
 			twitter.updateStatus(status);
 		} catch (TwitterException e) {
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 		}
 	}
 
@@ -222,7 +213,7 @@ public class TwitterManager {
 			}
 		} catch (TwitterException e) {
 			Log.e(TAG, "cannot get Frindliest");
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 		}
 		return null;
 	}
@@ -256,7 +247,7 @@ public class TwitterManager {
 			}
 		} catch (Exception e) {
 			Log.e(TAG, "cannot parse the accounts list file");
-			e.printStackTrace();
+			Log.d(TAG, Log.stack2string(e));
 		}
 		return ret;
 	}

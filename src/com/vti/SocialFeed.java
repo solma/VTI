@@ -408,6 +408,9 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 		case R.id.about_us:
 			handleAboutUs();
 			return true;
+		case R.id.top_publishers:
+			handleTopPublishers();
+			return true;
 		default:
 			return false;
 		}
@@ -662,6 +665,51 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 		});
 		 */
 		dialog.show();
+	}
+	
+	/**
+	 * handle TopPublishers click
+	 */
+	private void handleTopPublishers(){
+		InetAddress addr = null;
+		SocketAddress sockaddr = null;
+		PrintWriter out = null;
+		Socket clientSocket = new Socket();
+		try {
+			addr = InetAddress.getByName(Constants.SERVER_IP);
+			sockaddr = new InetSocketAddress(addr,
+					Constants.SERVER_PORT);
+		} catch (UnknownHostException e) {
+			Log.e(TAG, "Unknow Host Exception: cannot resolve "+ Constants.SERVER_IP);
+			return;
+		}
+		// set connection time out
+		try {
+			clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
+		} catch (IOException e) {
+			Log.e(TAG, "Time out when connect to server");
+			Toast.makeText(getApplicationContext(),"Cannot connect to the server.", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		try {
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+			out.println("Feedback");
+			if(twitter!=null)
+				try {
+					out.println(twitter.getScreenName());
+				} catch (Exception e) {
+					out.println("anonymous");
+					Log.d(TAG, Log.stack2string(e));
+				}
+			else
+				out.println("anonymous");
+			out.println(feedbackText.getText().toString());
+			out.close();
+			clientSocket.close();
+			Toast.makeText(getApplicationContext(),"Successfully sent feedback.", Toast.LENGTH_SHORT).show();
+		} catch (IOException e) {
+			Log.d(TAG, Log.stack2string(e));
+		}
 	}
 	
 	/**

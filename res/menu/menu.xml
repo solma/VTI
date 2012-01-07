@@ -7,6 +7,13 @@
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/settings">
     </item>
+    
+    <item
+        android:id="@+id/top_publishers"
+        android:enabled="true"
+        android:icon="@android:drawable/top_publishers"
+        android:title="Top Publishers">
+    </item>
 
     <item
         android:id="@+id/help"
@@ -22,6 +29,8 @@
         android:title="@string/feedback">
     </item>
 
+
+    
     <item
         android:id="@+id/about_us"
         android:enabled="true"

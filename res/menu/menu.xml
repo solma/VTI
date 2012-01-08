@@ -11,7 +11,7 @@
     <item
         android:id="@+id/top_publishers"
         android:enabled="true"
-        android:icon="@android:drawable/top_publishers"
+        android:icon="@drawable/top_publishers"
         android:title="Top Publishers">
     </item>
 

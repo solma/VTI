@@ -12,7 +12,9 @@
  */
 package com.vti;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -674,13 +676,20 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 		InetAddress addr = null;
 		SocketAddress sockaddr = null;
 		PrintWriter out = null;
+		BufferedReader in = null;
 		Socket clientSocket = new Socket();
+		Context ctxt=getApplicationContext();
+		if(!isOnline()){
+			Toast.makeText(ctxt, Constants.INTERNET_NOT_AVAILABLE, Toast.LENGTH_SHORT).show();
+			return;
+		}
 		try {
 			addr = InetAddress.getByName(Constants.SERVER_IP);
 			sockaddr = new InetSocketAddress(addr,
 					Constants.SERVER_PORT);
 		} catch (UnknownHostException e) {
 			Log.e(TAG, "Unknow Host Exception: cannot resolve "+ Constants.SERVER_IP);
+			Toast.makeText(ctxt, Constants.SERVER_ERROR, Toast.LENGTH_SHORT).show();
 			return;
 		}
 		// set connection time out
@@ -688,26 +697,67 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 			clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
 		} catch (IOException e) {
 			Log.e(TAG, "Time out when connect to server");
-			Toast.makeText(getApplicationContext(),"Cannot connect to the server.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(ctxt, Constants.SERVER_ERROR, Toast.LENGTH_SHORT).show();
 			return;
 		}
 		try {
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			out.println("Feedback");
-			if(twitter!=null)
-				try {
-					out.println(twitter.getScreenName());
-				} catch (Exception e) {
-					out.println("anonymous");
-					Log.d(TAG, Log.stack2string(e));
-				}
-			else
-				out.println("anonymous");
-			out.println(feedbackText.getText().toString());
+			out.println("Top Publishers");
+			String fromServer = in.readLine();
+			ArrayList<String> topPublishers=new ArrayList<String>();
+			while (fromServer != null) {
+				topPublishers.add(fromServer);
+				Log.e(TAG, fromServer);
+				fromServer=in.readLine();
+			}
 			out.close();
+			in.close();
 			clientSocket.close();
-			Toast.makeText(getApplicationContext(),"Successfully sent feedback.", Toast.LENGTH_SHORT).show();
-		} catch (IOException e) {
+			
+			final CharSequence[] items = topPublishers.toArray(new CharSequence[1]);
+			final ArrayList<Boolean> selected=new ArrayList<Boolean>();
+			final StringBuilder followList=new StringBuilder();
+			for(int i=0;i<items.length;i++)
+				selected.add(false);
+			AlertDialog select = new AlertDialog.Builder(SocialFeed.this)
+					.setTitle("Follow Top VTI Publishers")
+					.setMultiChoiceItems(items, null,
+							new OnMultiChoiceClickListener() {
+								@Override
+								public void onClick(DialogInterface arg0,
+										int position, boolean checked) {
+									if (checked) { // the selection check the item
+										selected.set(position, true);
+									} else {// the selection uncheck the item;
+										selected.set(position, false);
+									}
+								}
+							})
+					.setPositiveButton("Follow",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int whichButton) {
+									for (int i = 0; i < selected.size(); i++)
+										if (selected.get(i)) {
+											if (followList.length() > 0)
+												followList.append(";");
+											followList.append(items[i]);
+										}
+									Log.e(TAG, followList.toString());
+									new FollowAsyncTask().execute(followList.toString());
+								}
+							})
+					.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int whichButton) {
+								}
+							}).create();
+			select.show();
+			
+		} catch (Exception e) {
 			Log.d(TAG, Log.stack2string(e));
 		}
 	}

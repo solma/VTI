@@ -165,7 +165,7 @@ public class TwitAdapter extends BaseAdapter {
 						clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
 					} catch (IOException e) {
 						Log.e(TAG, "Time out when connect to server");
-						Toast.makeText(context, Constants.VOTE_ERROR,
+						Toast.makeText(context, Constants.SERVER_ERROR,
 								Toast.LENGTH_SHORT).show();
 						return;
 					}
@@ -220,7 +220,7 @@ public class TwitAdapter extends BaseAdapter {
 						clientSocket.connect(sockaddr, Constants.THREE_SECONDS);
 					} catch (IOException e) {
 						Log.e(TAG, "Time out when connect to server");
-						Toast.makeText(context, Constants.VOTE_ERROR,
+						Toast.makeText(context, Constants.SERVER_ERROR,
 								Toast.LENGTH_SHORT).show();
 						return;
 					}

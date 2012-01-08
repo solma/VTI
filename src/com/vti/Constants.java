@@ -36,7 +36,7 @@ public class Constants {
 	public static final String VTI_HOMEPAGE="http://www.cs.uic.edu/~sma/VTI/";
 	public static final String ACCOUNTS_LIST="http://www.cs.uic.edu/~sma/VTI/accounts.xml";
 	public static final int SERVER_PORT='V'+'T'+'I';
-	public static final String VOTE_ERROR = "Failed to vote because cannot connect to the server.";
+	public static final String SERVER_ERROR = "Failed, cannot connect to the server. Please try again later.";
 	public static final String VOTE_SUCCESS = "Vote succeed!";
 	public static final String REPEAT_VOTE = "Already voted, cannot vote repeatly.";
 	public static final String INTERNET_NOT_AVAILABLE="Need Internet connection.";

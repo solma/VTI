@@ -35,12 +35,12 @@ public class Help extends Activity {
 				"button or pressing it for 1 sec.\n\n" +
 				
 				"You can subscribe transportation information by\n(i). " +
-				"clikcing the 'follow/unfollow' or 'unfollow by select' buttons to directly follow/unfollow specified Twitter " +
+				"clicking the 'follow/unfollow' or 'follow/unfollow by select' buttons to directly follow/unfollow specified Twitter " +
 				"accounts that governed by VTI (each VTI Twitter account corresponds to an geographical area such that all " +
 				"transportation information within the area that are posted to Twitter via VTI is reposted by the account)\n" +
 				"(ii). click the 'route' button to define a customized route and subscribe the route. Note that at any time " +
 				"only one route can be subscribed. Subscribe to a new route will automatically unsubscribe last route if it " +
-				"has not been unsubscribed.\n\nFor any received notificaiton, you can 'thumb' it up or down. This will help " +
+				"has not been unsubscribed.\n\nFor any received notification, you can 'thumb' it up or down. This will help " +
 				"VTI filter inaccurate and falsified information and improve notification data quality.\n\n" +
 				
 				"VTI mainly relies on user generated data. Therefore the more people use it, the more useful it becomes. So any" +

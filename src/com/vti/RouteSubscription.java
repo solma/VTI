@@ -149,6 +149,10 @@ public class RouteSubscription extends MapActivity {
 		String bestProvider=locMgr.getLocationManager().getBestProvider(criteria, true);
 		//Location lastKnownLocation=locationManager.getLastKnownLocation(bestProvider);
 		mHandler=new MapUpdateHandler();
+		if(bestProvider==null){
+			bestProvider=LocationManager.GPS_PROVIDER;
+			Toast.makeText(context, Constants.LOCATION_DISABLED, Toast.LENGTH_LONG).show();
+		}
 		locMgr.getLocationManager().requestLocationUpdates(bestProvider, Constants.MINTIME, Constants.MINDISTANCE, mHandler);
 
 		priv=(RadioButton) findViewById(R.id.priv);
@@ -184,10 +188,13 @@ public class RouteSubscription extends MapActivity {
 					origin=fromText+",Chicago";
 				else{
 					Location loc=locMgr.getLatestLocation();
-					Log.e(TAG,"LAST LOCATION: "+loc);
+					if(loc==null){
+						Toast.makeText(context, Constants.LOCATION_NOT_AVAILABLE, Toast.LENGTH_SHORT).show();
+						return;
+					}
 					origin=GeoCoder.reverseGeocode(loc.getLatitude(),loc.getLongitude());
 					if(origin==null){
-						Toast.makeText(context,"Failed to interpret current GPS location.", Toast.LENGTH_LONG);
+						Toast.makeText(context, Constants.REVERSE_GEOCODE_ERROR, Toast.LENGTH_LONG).show();
 						return;
 					}
 				}

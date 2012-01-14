@@ -17,7 +17,7 @@ public class Constants {
 	 * Internet related
 	 */
 	public static String SERVER_IP="67.167.207.236";
-	{
+	static{
 		URL serverIP;
 		String inputLine, ip=null;
 		try {
@@ -36,12 +36,21 @@ public class Constants {
 	public static final String VTI_HOMEPAGE="http://www.cs.uic.edu/~sma/VTI/";
 	public static final String ACCOUNTS_LIST="http://www.cs.uic.edu/~sma/VTI/accounts.xml";
 	public static final int SERVER_PORT='V'+'T'+'I';
+	
+	/**
+	 * Error Messages
+	 */
 	public static final String SERVER_ERROR = "Failed, cannot connect to the server. Please try again later.";
 	public static final String VOTE_SUCCESS = "Vote succeed!";
 	public static final String REPEAT_VOTE = "Already voted, cannot vote repeatly.";
+	
 	public static final String INTERNET_NOT_AVAILABLE="Need Internet connection.";
+	
 	public static final String ACCOUNT_LIST_NOT_AVAILABLE="VTI account list is not available for the moment, please try again later.";
 	
+	public static final String LOCATION_DISABLED="Please enable a My Location source in the system settings.";
+	public static final String LOCATION_NOT_AVAILABLE="Sorry, location information is not available now. Please try later.";
+	public static final String REVERSE_GEOCODE_ERROR="Failed to interpret current GPS location.";
 	/**
 	 * SharedPreference files and keys names
 	 */
@@ -64,7 +73,7 @@ public class Constants {
 	public static final String UPDATE_FREQUENCY="UpdateFrequency";
 	
 	/** 
-	 * Time Units
+	 * Time Units in milliseconds
 	 */
 	public static final int THREE_SECONDS= 1000 * 3;
 	public static final long TEN_SECONDS = 1000 * 10;

@@ -1,0 +1,17 @@
+1. Location stamping. Location stamping means the mobile device automatically appends user location info. to the publication.
+A mechanism/model is required to defining how to obtain user location. The article at   
+http://developer.android.com/guide/topics/location/obtaining-user-location.html discusses this issue in details.
+
+2. Publish incentives. VTI needs to provide incentives for publishers. The problem can be approached from two ways. 
+On one hand, VTI can bring in real currency or currency interchangeable commodities by collaborations with local businesses to incite publishers 
+. For example, sell ads positions in VTI to local stores to collect funds for rewarding publishers or distribute in-store coupons to publishers.
+On the other hand,  if VTI can attract and keep a critical number of users, then there is a good chance some users will voluntarily publish (suppose
+a small proportion of population are regular content contributers.) In order to be attractive to users, VTI needs to vouch minimum 
+information to users. That is to say, users can still get at least external information upon subscriptions even without any user generated data. Specifically,
+there are 3 different types of subscriptions.
+(i) subscriptions for transit transportation.  External information can be RSS feeds from CTA. Now only alerts for train routes (e.g. scheduled platform closings, or elevator out-of-service announcements, etc.) are fed into VTI.
+Bus and train location information can also be fed into VTI. 
+(ii) subscriptions for private transportation. External information can be relative traffic conditions from traffic web sites such as Google Map or Traffic.com. However these web sites
+only color traffic condition on map. How to automatically obtain traffic details from colored map is difficult.
+(iii) subscriptions for parking information. External information include the positions and rates of parking peters for street parking and maybe locations and rates for proprietary parking lots.   
+

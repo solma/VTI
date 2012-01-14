@@ -25,6 +25,9 @@ public class LocManager {
 				Log.d(TAG,latestLocation.getLatitude()+" "+latestLocation.getLongitude());
 			}
 		}
+		// if the lastest location is too stale, the return null;
+		if(System.currentTimeMillis()-latestLocation.getTime()>Constants.ONE_MINUTE*2)
+			return null;
 		return latestLocation;
 	}
 	

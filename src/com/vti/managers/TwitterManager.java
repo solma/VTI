@@ -100,9 +100,11 @@ public class TwitterManager {
 			final List<Status> statues = twitter.getHomeTimeline();
 			twits = new ArrayList<Twit>(statues.size());
 
+			long oneDayAgo=System.currentTimeMillis()-Constants.THIRTY_MINUTE*48;
 			for (Status status : statues) {
-				// only return tweets from VTI accounts
-				if (status.getUser().getName().toLowerCase().startsWith("vti_")) {
+				// only return tweets from VTI accounts and that are not old than 1 day
+				if (status.getUser().getName().toLowerCase().startsWith("vti_")&&
+						status.getCreatedAt().getTime()>oneDayAgo) {
 					//Log.d(TwitterManager.class.getSimpleName(), status.getUser().getName() + "  " + status.getText());
 					twits.add(new Twit(status.getId(),  status.getCreatedAt().getTime(), status.getUser()
 							.getName(), status.getUser().getProfileImageURL()

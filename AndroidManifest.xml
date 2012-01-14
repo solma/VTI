@@ -17,7 +17,7 @@
 				<data android:scheme="VTI" android:host="twitter"></data>
 			</intent-filter>
 		</activity>
-		<activity android:name="SocialFeed"
+		<activity android:name=".SocialFeed"
 			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 			android:screenOrientation="portrait" android:launchMode="singleTask"></activity>
 		<activity android:name=".AboutUs"></activity>

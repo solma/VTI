@@ -53,7 +53,7 @@ public class SplashScreen extends Activity {
 	public void onCreate(final Bundle savedInstanceState) {
 		try {
 			super.onCreate(savedInstanceState);
-			setContentView(R.layout.main);
+			setContentView(R.layout.login);
 			twitterButton = (ImageButton) findViewById(R.id.vti);
 			createAuthorizationRequests(twitterButton);
 			
@@ -66,7 +66,7 @@ public class SplashScreen extends Activity {
 				createAuthorizationRequests(twitterButton);
 			} else {
 				twitterButton.setVisibility(View.INVISIBLE);
-				navigateToSocialFeed();
+				navigateToMain();
 				Log.d(TAG,accMgr.getAuthTokens().toString());
 			}
 		} catch (Exception e) {
@@ -138,16 +138,16 @@ public class SplashScreen extends Activity {
 		super.onNewIntent(intent);
 		try {
 			saveAccountInfo(intent);
-			navigateToSocialFeed();
+			navigateToMain();
 		} catch (final Exception e) {
 			Log.d(TAG, Log.stack2string(e));
 		}
 	}
 
 	/**
-	 * GO to List View to load twits
+	 * GO to main window
 	 */
-	private void navigateToSocialFeed() {
+	private void navigateToMain() {
 		final Intent navIntent = new Intent(getApplicationContext(),SocialFeed.class);
 		finish();
 		startActivity(navIntent);

@@ -80,12 +80,11 @@ import com.vti.utils.CustomEventListener;
 import com.vti.utils.GeoCoder;
 import com.vti.utils.Log;
 
-public class SocialFeed extends ListActivity implements CustomEventListener, TextToSpeech.OnInitListener{
+public class SocialFeed extends ListActivity implements CustomEventListener{
 	private static final String TAG = SocialFeed.class.getSimpleName();
 	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
 	private static final String UPDATE_FREQUENCY_INPUT_ERROR="Update frequncy has to be an integer.";
 	
-	private TextToSpeech mTts;
 	private AccountManager authMgr;
 	private ISocialService socialService;
 	private ImageButton refreshButton;
@@ -310,12 +309,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.feed_list);
-	        // Initialize text-to-speech. This is an asynchronous operation.
-	        // The OnInitListener (second argument) is called after initialization completes.
-	        mTts = new TextToSpeech(this,
-	        		this  // TextToSpeech.OnInitListener
-	            );
-			
+
 			refreshButton = (ImageButton) findViewById(R.id.force_refresh);
 			publishButton = (ImageButton)findViewById(R.id.publish);
 			followUnfollowButton = (ImageButton)findViewById(R.id.follow_unfollow);
@@ -1001,11 +995,6 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-	     // Don't forget to shutdown mTts!
-        if (mTts != null) {
-            mTts.stop();
-            mTts.shutdown();
-        }
 
 		Log.d(TAG, "ON DESTROY");
 		// Other wise we will leak a connection
@@ -1021,23 +1010,5 @@ public class SocialFeed extends ListActivity implements CustomEventListener, Tex
 		return false;
 	}
 
-	@Override
-	public void onInit(int status) {
-        // status can be either TextToSpeech.SUCCESS or TextToSpeech.ERROR.
-        if (status == TextToSpeech.SUCCESS) {
-            // Set preferred language to US english.
-            // Note that a language may not be available, and the result will indicate this.
-            int result = mTts.setLanguage(Locale.US);
-            // Try this someday for some interesting results.
-            // int result mTts.setLanguage(Locale.FRANCE);
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-               // Lanuage data is missing or the language is not supported.
-                Log.e(TAG, "Language is not available.");
-            } 
-        } else {
-            // Initialization failed.
-            Log.e(TAG, "Could not initialize TextToSpeech.");
-        }
-	}
 	
 }

@@ -25,6 +25,8 @@ import java.util.List;
 import twitter4j.Twitter;
 import android.app.Dialog;
 import android.content.Context;
+import android.location.Location;
+
 import com.vti.utils.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +44,7 @@ import com.vti.R;
 import com.vti.SocialFeed;
 import com.vti.managers.AccountManager;
 import com.vti.managers.DrawableManager;
+import com.vti.managers.LocManager;
 import com.vti.model.Twit;
 import com.vti.utils.CustomEventHandler;
 import com.vti.utils.CustomEventListener;
@@ -58,6 +61,7 @@ public class TwitAdapter extends BaseAdapter {
 	private Twitter twitter;
 	private String voterName;
 	private DrawableManager drawableManager = new DrawableManager();
+	private LocManager locMgr;
 	private CustomEventListener callback;
 	/**
 	 * @param context
@@ -71,6 +75,7 @@ public class TwitAdapter extends BaseAdapter {
 		this.callback=callback;
 		
 		AccountManager authMgr = new AccountManager(context);
+		locMgr=new LocManager(context);
 		if (!authMgr.isAccountEmpty()){
 			twitter = authMgr.getTwitterFactory().getInstance(); 
 		}
@@ -138,7 +143,17 @@ public class TwitAdapter extends BaseAdapter {
 		//upThumbs.setText(Long.toString(twit.getUpThumbs()));
 		final TextView downThumbs = (TextView) row.findViewById(R.id.downThumbsNum);
 		//upThumbs.setText(Long.toString(twit.getDownThumbs()));
-
+		
+		
+		//get the location when the user rates
+		Location loc=locMgr.getLatestLocation();
+		final String curLoc;
+		if(loc!=null){
+			curLoc=String.valueOf(loc.getLatitude())+":"+String.valueOf(loc.getLongitude());
+		}else{
+			curLoc="not available";
+		}
+		
 		// update the # of upThumb votes and the # of downThumb votes
 		upThumbs_button.setOnClickListener(new OnClickListener() {
 			@Override
@@ -172,7 +187,6 @@ public class TwitAdapter extends BaseAdapter {
 					try {
 						out = new PrintWriter(clientSocket.getOutputStream(),
 								true);
-
 						//in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 						/**
 						 * Integer timeout in milliseconds for blocking accept
@@ -181,7 +195,7 @@ public class TwitAdapter extends BaseAdapter {
 						 */
 						//while (in.readLine() != null);
 						//Log.e(TAG, "After readLine.");
-						out.print(twit.getTwitMessage() + "," + voterName + ",up");
+						out.print(twit.getTwitMessage() + ","+ voterName + ",up,"+curLoc+","+twit.getTwitId() );
 						out.close();
 						clientSocket.close();
 						twit.increaseUpThumbs();
@@ -227,7 +241,7 @@ public class TwitAdapter extends BaseAdapter {
 					try {
 						out = new PrintWriter(clientSocket.getOutputStream(),
 								true);
-						out.print(twit.getTwitMessage() + "," + voterName + ",down");
+						out.print(twit.getTwitMessage() + ","+ voterName + ",down,"+curLoc+","+twit.getTwitId() );
 						out.close();
 						clientSocket.close();
 						twit.increaseDownThumbs();

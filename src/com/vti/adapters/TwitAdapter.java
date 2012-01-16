@@ -23,17 +23,13 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import twitter4j.Twitter;
-import android.app.Dialog;
 import android.content.Context;
 import android.location.Location;
-
-import com.vti.utils.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,13 +37,13 @@ import android.widget.Toast;
 
 import com.vti.Constants;
 import com.vti.R;
-import com.vti.SocialFeed;
 import com.vti.managers.AccountManager;
 import com.vti.managers.DrawableManager;
 import com.vti.managers.LocManager;
 import com.vti.model.Twit;
 import com.vti.utils.CustomEventHandler;
 import com.vti.utils.CustomEventListener;
+import com.vti.utils.Log;
 
 /**
  * @author (sg)

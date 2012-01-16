@@ -37,7 +37,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import com.vti.utils.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -58,6 +57,7 @@ import com.vti.managers.TwitterManager;
 import com.vti.model.Station;
 import com.vti.model.TransitRoute;
 import com.vti.utils.GeoCoder;
+import com.vti.utils.Log;
 import com.vti.utils.PercentEncode;
 
 public class RouteSubscription extends MapActivity {
@@ -137,9 +137,9 @@ public class RouteSubscription extends MapActivity {
 		mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setStreetView(true);
-		//mapView.setTraffic(true);
+		mapView.setTraffic(true);
 		mapController = mapView.getController();
-		mapController.setZoom(14); // Zoom 1 is world view
+		mapController.setZoom(13); // Zoom 1 is world view
 		locMgr = new LocManager(context);
 
 		

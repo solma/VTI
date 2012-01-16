@@ -13,6 +13,9 @@
 package com.vti;
 
 import java.io.BufferedReader;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -23,6 +26,7 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -228,14 +232,15 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 
 	private class TweetAsyncTask extends AsyncTask<String, Void, Void> {
 		@Override
+		/**
+		 * @param message, lat, lng
+		 */
 		protected Void doInBackground(final String... params) {
 			final TwitterManager twitterMgr = new TwitterManager(
 					getApplicationContext());
 			final AccountManager authMgr = twitterMgr.getOAuthMgr();
-			final LocManager locMgr=new LocManager(getApplicationContext());
-			Location loc=locMgr.getLatestLocation();
 			if (!authMgr.isAccountEmpty()) {
-				twitterMgr.tweet(params[0], new GeoLocation(loc.getLatitude(),loc.getLongitude()));
+				twitterMgr.tweet(params[0], new GeoLocation(Double.parseDouble(params[1]), Double.parseDouble(params[2])) );
 			}
 			return null;
 		}
@@ -415,6 +420,9 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 	private void retrieveEncounteredAccount(){
 		final LocManager locMgr=new LocManager(getApplicationContext());
 		Location loc=locMgr.getLatestLocation();
+		if(loc==null){
+			return;
+		}
 		if (!authMgr.isAccountEmpty()) {
 			String accountName=GeoCoder.determineVTIAccount(
 					new GeoPoint((int)(loc.getLatitude()*1.0E6),(int)(loc.getLongitude()*1.0E6)));
@@ -631,16 +639,40 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 			tweetText.setText(input);
 		}
 
+		final LocManager locMgr=new LocManager(getApplicationContext());
+		final Location curLoc=locMgr.getLatestLocation();
+
+		final SingleLocationUpdateListener ll=new SingleLocationUpdateListener();
+		
+		/*
+		if(curLoc!=null){
+			Log.e(TAG, new Date(curLoc.getTime()).toLocaleString());
+		}else{
+			Log.e(TAG, "no location info. available, request one");
+		}
+		*/
+
+		// if last location estimate is older than Constants.MINTIME, then request a single update	
 		publishButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				dialog.cancel();
-				TweetAsyncTask tweetAsyncTask = new TweetAsyncTask();
-				//always add "@VTI " to the beginning of the tweet
-				tweetAsyncTask.execute("@vti_robot "+tweetText.getText().toString());
+				if(curLoc!=null){
+					TweetAsyncTask tweetAsyncTask = new TweetAsyncTask();
+					//always add "@VTI " to the beginning of the tweet
+					tweetAsyncTask.execute("@vti_robot "+tweetText.getText().toString(), String.valueOf(curLoc.getLatitude()), String.valueOf(curLoc.getLongitude()));
+				}else{
+					ll.setLocManager(locMgr);
+					ll.setText(tweetText.getText().toString());
+					ll.setTime(System.currentTimeMillis());
+					for(String provider: locMgr.getLocationManager().getProviders(true)){
+						locMgr.getLocationManager().requestLocationUpdates(provider, Constants.MINTIME, Constants.MINDISTANCE, ll);
+						break; //only one provider would do
+					}
+				}
 			}
 		});
-		
+
 		cancelButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -1008,6 +1040,49 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 	public boolean onCustomLongClick(View row, String input) {
 		handlePublish(input);
 		return false;
+	}
+	
+	class SingleLocationUpdateListener implements LocationListener{
+		long curTime;
+		String tweet;
+		LocManager locMgr;
+		@Override
+		public void onLocationChanged(Location update) {
+			Log.e(TAG, "receive a new Location");
+			// this update comes 1 min after the publishing action
+			if(update.getTime()-curTime>Constants.ONE_MINUTE){
+				Log.e(TAG, new Date(update.getTime()).toLocaleString()+"  "+new Date(curTime).toLocaleString());
+				//remove this listener
+				locMgr.getLocationManager().removeUpdates(this);
+				TweetAsyncTask tweetAsyncTask = new TweetAsyncTask();
+				Location curLoc=locMgr.getLastLocation();
+				//always add "@VTI " to the beginning of the tweet
+				tweetAsyncTask.execute("@vti_robot "+tweet, String.valueOf(curLoc.getLatitude()), String.valueOf(curLoc.getLongitude()));
+				return;
+			}
+			locMgr.getLatestLocation(); //update the latest location within the location Manager;
+		}
+		
+		public void setLocManager(LocManager locManager){
+			locMgr=locManager;
+		}
+	
+		public void setTime(long time){
+			curTime=time;
+		}
+		
+		public void setText(String s){
+			tweet=s;
+		}
+	
+		@Override
+		public void onProviderDisabled(String arg0) {}
+
+		@Override
+		public void onProviderEnabled(String arg0) {}
+
+		@Override
+		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
 	}
 
 	

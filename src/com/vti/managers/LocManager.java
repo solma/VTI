@@ -1,13 +1,10 @@
 package com.vti.managers;
 
-import com.vti.Constants;
-
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
+
+import com.vti.Constants;
 import com.vti.utils.Log;
 
 public class LocManager {
@@ -16,9 +13,9 @@ public class LocManager {
 	private Context context;
 	private Location latestLocation;
 	private LocationManager locationMgr;
-
+	
 	public Location getLatestLocation() {
-		for(String provider: locationMgr.getAllProviders()){
+		for(String provider: locationMgr.getProviders(true)){
 			Location location=locationMgr.getLastKnownLocation(provider);
 			if(location!=null){				
 				latestLocation = isBetterLocation(location, latestLocation) == true ? location: latestLocation;
@@ -26,15 +23,19 @@ public class LocManager {
 			}
 		}
 		// if the lastest location is too stale, the return null;
-		if(System.currentTimeMillis()-latestLocation.getTime()>Constants.ONE_MINUTE*2)
+		if(System.currentTimeMillis()-latestLocation.getTime()>Constants.MINTIME)
 			return null;
+		return latestLocation;
+	}
+	
+	public Location getLastLocation(){
 		return latestLocation;
 	}
 	
 	public LocationManager getLocationManager(){
 		return locationMgr;
 	}
-
+	
 	public LocManager(Context ctxt) {
 		this.context = ctxt;
 		// latestLocation=null;
@@ -53,7 +54,7 @@ public class LocManager {
 	 *            The current Location fix, to which you want to compare the new
 	 *            one
 	 */
-	protected boolean isBetterLocation(Location location,
+	public boolean isBetterLocation(Location location,
 			Location currentBestLocation) {
 		if (currentBestLocation == null) {
 			// A new location is always better than no location

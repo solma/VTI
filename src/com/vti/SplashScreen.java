@@ -148,6 +148,7 @@ public class SplashScreen extends Activity {
 	 * GO to main window
 	 */
 	private void navigateToMain() {
+		//TODO This is the switcher  
 		final Intent navIntent = new Intent(getApplicationContext(),SocialFeed.class);
 		finish();
 		startActivity(navIntent);

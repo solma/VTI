@@ -102,6 +102,7 @@ public class RouteSubscription extends MapActivity {
 		// initialize
 		super.onCreate(bundle);
 		setContentView(R.layout.route); 
+		Log.d(TAG, "On Create");
 		context = getApplicationContext();
 		twitterMgr=new TwitterManager(getApplicationContext());
 		

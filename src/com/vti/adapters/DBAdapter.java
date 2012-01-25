@@ -41,8 +41,8 @@ public class DBAdapter
 	
 	private static final int DATABASE_VERSION = 1;
 
-	private static final String DATABASE_CREATE = 
-			"create table "+DATABASE_TABLE+" ("+KEY_TWITID+" integer primary key , "+ KEY_TIMESTAMP + " integer not null, " 
+	private static final String CREATE_NOTIFICATION_TABLE = 
+			"create table notifications"+" ("+KEY_TWITID+" integer primary key , "+ KEY_TIMESTAMP + " integer not null, " 
 			+ KEY_PROFILE_NAME+" text not null, "+KEY_PROFILE_IMAGE_URL+" text not null, " + KEY_TWIT_MESSAGE+" text not null, "
 			+ KEY_UP_THUMBS+" integer not null, "+ KEY_DOWN_THUMBS+ " integer not null) ;";
 
@@ -69,7 +69,7 @@ public class DBAdapter
 		@Override
 		public void onCreate(final SQLiteDatabase db)
 		{
-			db.execSQL(DATABASE_CREATE);
+			db.execSQL(CREATE_NOTIFICATION_TABLE);
 		}
 
 

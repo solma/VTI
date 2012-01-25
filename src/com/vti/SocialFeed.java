@@ -118,6 +118,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 		}
 		// Called when the connection with the service disconnects unexpectedly
 		public void onServiceDisconnected(final ComponentName className) {
+			Log.e(TAG, "socialService disconnected unexpectedly");
 			socialService = null;
 		}
 	};
@@ -209,7 +210,9 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 		@Override
 		protected List<Twit> doInBackground(final String... params) {
 			List<Twit> result = null;
+			Log.d(TAG, "Within FetechFromEncounteredAccount doInBackground");
 			if (null != socialService) {
+				Log.d(TAG, "Within FetechFromEncounteredAccount doInBackground");
 				try {
 					result = socialService.getFromEncounteredAccount(params[0]);
 				} catch (final RemoteException e) {
@@ -222,6 +225,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 		@Override
 		protected void onPostExecute(final List<Twit> result) {
 			super.onPostExecute(result);
+			Log.d(TAG, "Within FetechFromEncounteredAccount onPostExecute");
 			if (null != result) {
 				final TwitAdapter adapter = new TwitAdapter(getApplicationContext(), result, SocialFeed.this);
 				Log.e(TAG, "Get publications from encountered account");
@@ -314,7 +318,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.feed_list);
-
+			Log.d(TAG, "On Create");
 			refreshButton = (ImageButton) findViewById(R.id.force_refresh);
 			publishButton = (ImageButton)findViewById(R.id.publish);
 			followUnfollowButton = (ImageButton)findViewById(R.id.follow_unfollow);
@@ -362,6 +366,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 			authMgr = new AccountManager(getApplicationContext());
 	
 			if (null != authMgr.getTwitterFactory()) {
+				Log.e(TAG, "going to bind the service");
 				bindService(new Intent(getApplicationContext(),
 						SocialServiceImpl.class), connection,
 						Context.BIND_AUTO_CREATE);
@@ -426,8 +431,11 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 		if (!authMgr.isAccountEmpty()) {
 			String accountName=GeoCoder.determineVTIAccount(
 					new GeoPoint((int)(loc.getLatitude()*1.0E6),(int)(loc.getLongitude()*1.0E6)));
-			if(accountName!=null)
+			if(accountName!=null){
+				Log.e(TAG, "Before FetechFromEncounteredAccount");
 				new  FetechFromEncounteredAccount().execute(accountName);
+				Log.e(TAG,"After FetechFromEncounteredAccount");
+			}
 		}
 	}
 
@@ -988,16 +996,19 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 		Log.d(TAG, "ON PAUSE");
 	}
 
+	
+	/*
 	/**
 	 * Register Broadcast receiver to update twit feeds when SocialService sends
 	 * a broadcast of new twits available
-	 * */
+	 */
 	@Override
 	protected void onStart() {
 		super.onStart();
 		Log.d(TAG, "ON START");
 	}
-
+	
+	
 	@Override
 	protected void onNewIntent(Intent intent) {
 		Log.d(TAG, "ON NEW INTENT");

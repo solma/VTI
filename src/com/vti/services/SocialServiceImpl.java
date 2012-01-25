@@ -139,6 +139,7 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 
 	@Override
 	public IBinder onBind(final Intent intent) {
+		Log.e(TAG,"on Bind, the service is bond.");
 		return mBinder;
 	}
 

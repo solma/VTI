@@ -54,6 +54,6 @@ public class VTIMain extends TabActivity {
         tabHost.addTab(spec);
 		*/
 
-        tabHost.setCurrentTab(0);
+        tabHost.setCurrentTab(1);
     }
 }

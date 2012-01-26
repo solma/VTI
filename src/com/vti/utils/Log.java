@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class Log {
-	static final boolean LOG = true;
+	static final boolean LOG = false;
 	
 	public static String stack2string(Exception e) {
 		try {

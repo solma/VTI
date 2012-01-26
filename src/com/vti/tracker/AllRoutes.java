@@ -59,6 +59,10 @@ public class AllRoutes extends ListActivity {
 		}
 	}
 	
+	protected void onDestroy(){
+		super.onDestroy();
+	}
+	
 	/**
 	 * 
 	 * @return All Routes in the DB

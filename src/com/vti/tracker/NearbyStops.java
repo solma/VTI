@@ -64,6 +64,7 @@ public class NearbyStops extends ListActivity {
 	}
 	
 	protected void onDestroy(){
+		super.onDestroy();
 		if(null!=ll){
 			//remove this listener
 			locMgr.getLocationManager().removeUpdates(ll);
@@ -125,15 +126,19 @@ public class NearbyStops extends ListActivity {
 	 		cursor = myDbHelper.getAllStops();
 	 		//int count=0;
 			while (cursor.moveToNext()) {
-				double lat2=Double.parseDouble(cursor.getString(2));
-				double lon2=Double.parseDouble(cursor.getString(3));
-				double dist=distBetween(lat1, lon1, lat2, lon2);
-				if(dist<MAX_DISTANCE){
-					CTAStop stop=new CTAStop(cursor.getString(0), cursor.getString(1), cursor.getString(2), 
-							cursor.getString(3), cursor.getString(4), cursor.getString(5),Boolean.valueOf(cursor.getString(6)));
-					stop.setDist(dist);
-					allStops.add(stop);
-					//count++;
+				try{
+					double lat2=Double.parseDouble(cursor.getString(2));
+					double lon2=Double.parseDouble(cursor.getString(3));
+					double dist=distBetween(lat1, lon1, lat2, lon2);
+					if(dist<MAX_DISTANCE){
+						CTAStop stop=new CTAStop(cursor.getString(0), cursor.getString(1), cursor.getString(2), 
+								cursor.getString(3), cursor.getString(4), cursor.getString(5),Boolean.valueOf(cursor.getString(6)));
+						stop.setDist(dist);
+						allStops.add(stop);
+						//count++;
+					}
+				}catch(Exception e){
+					continue;
 				}
 			}
 	 	}catch(SQLException e){
@@ -153,6 +158,7 @@ public class NearbyStops extends ListActivity {
         final CTAStop stop = allStops.get(position);
         b.putString("rtId", stop.rtId());
         b.putString("stpId", stop.stpId());
+        b.putString("stpName", stop.stpName());
         b.putInt("isBus", stop.isBus()?1:0);
         navIntent.putExtras(b);
 		startActivity(navIntent);	

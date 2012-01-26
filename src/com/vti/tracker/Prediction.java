@@ -24,12 +24,14 @@ import org.jsoup.select.Elements;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vti.Constants;
@@ -46,10 +48,16 @@ public class Prediction extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.e(TAG, "On Create");
+		setContentView(R.layout.tracker_prediction);
+		TextView stopName=(TextView)findViewById(R.id.stopName);
+		
 	    Bundle b = getIntent().getExtras();
 	    rtId=b.getString("rtId");
 	    stpId = b.getString("stpId");
 	    isBus= b.getInt("isBus")>0?true:false;
+	    stopName.setText(b.getString("stpName"));
+		stopName.setTextColor(Color.BLUE);
+	    
 	    ArrayList<String> values;
 		if(!isOnline()){
 			Toast.makeText(getApplicationContext(), Constants.INTERNET_NOT_AVAILABLE, Toast.LENGTH_SHORT).show();
@@ -68,7 +76,7 @@ public class Prediction extends ListActivity {
 					values.toArray(new String[1]));
 			setListAdapter(adapter);
 		}else{
-			Toast.makeText(getApplicationContext(), "Please try later.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "No scheduled service. Please try later.", Toast.LENGTH_SHORT).show();
 		}
 	}
 	

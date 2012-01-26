@@ -152,7 +152,7 @@ public class SplashScreen extends Activity {
 					Constants.SETTING_PREFERENCE_FILE , 0);
 			boolean tracker_table_ready = settings.getBoolean(Constants.CTA_TABLE, false);
 			if(!tracker_table_ready){
-				new BuildCTATables().doInBackground();
+				new BuildCTATables().execute();
 			}
 			
 			saveAccountInfo(intent);

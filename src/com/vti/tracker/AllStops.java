@@ -90,6 +90,7 @@ public class AllStops extends ListActivity {
         final CTAStop stop = allStops.get(position);
         b.putString("rtId", route.rtId());
         b.putString("stpId", stop.stpId());
+        b.putString("stpName", stop.stpName());
         b.putInt("isBus", stop.isBus()?1:0);
         navIntent.putExtras(b);
 		startActivity(navIntent);	

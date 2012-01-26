@@ -63,10 +63,13 @@ public class DBAdapter
 
 	private final DatabaseHelper DBHelper;
 	private final CTATrackerDatabaseHelper CTATrackerDBHelper;
-	private SQLiteDatabase db;
-
+	
 	public CTATrackerDatabaseHelper getCTATrackerDBHelper(){
 		return CTATrackerDBHelper;
+	}
+	
+	public DatabaseHelper getDatabaseHelper(){
+		return DBHelper;
 	}
 	
 	public DBAdapter(final Context ctx)
@@ -76,20 +79,25 @@ public class DBAdapter
 		CTATrackerDBHelper=new CTATrackerDatabaseHelper(context);
 	}
 	
-	private static class DatabaseHelper extends SQLiteOpenHelper
-	{
+	public static class DatabaseHelper extends SQLiteOpenHelper	{
+		private SQLiteDatabase db;
+		private final Context myContext;
+		
 		DatabaseHelper(final Context context)
 		{
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+			myContext=context;
 		}
-
 
 		@Override
-		public void onCreate(final SQLiteDatabase db)
-		{
-			db.execSQL(CREATE_NOTIFICATION_TABLE);
+		public void onCreate(final SQLiteDatabase db){			
 		}
-
+		
+		// ---opens the database---
+		public void open() throws SQLException
+		{
+			db = this.getWritableDatabase();
+		}
 
 		@Override
 		public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion)
@@ -98,6 +106,48 @@ public class DBAdapter
 					+ ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS titles");
 			onCreate(db);
+		}
+		
+		// ---insert a twit into the database---
+		public long insertTwit(final long twitId, final long timestamp, final String profileName, final String profileImageUri, final String twitMessage, final long upThumbs, final long downThumbs)
+		{
+			final ContentValues initialValues = new ContentValues();
+			initialValues.put(KEY_TWITID, twitId);
+			initialValues.put(KEY_TIMESTAMP, timestamp);
+			initialValues.put(KEY_PROFILE_NAME, profileName);
+			initialValues.put(KEY_PROFILE_IMAGE_URL, profileImageUri);
+			initialValues.put(KEY_TWIT_MESSAGE, twitMessage);
+			initialValues.put(KEY_UP_THUMBS, upThumbs );
+			initialValues.put(KEY_DOWN_THUMBS, downThumbs );
+			return db.insert(DATABASE_TABLE, null, initialValues);
+		}
+
+		// ---update a twit into the database---
+		public long updateTwit(final long twitId, final long timestamp, final String profileName, final String profileImageUri, final String twitMessage, final long upThumbs, final long downThumbs)
+		{
+			final ContentValues updatedValues = new ContentValues();
+			updatedValues.put(KEY_TWITID, twitId);
+			updatedValues.put(KEY_TIMESTAMP, timestamp);
+			updatedValues.put(KEY_PROFILE_NAME, profileName);
+			updatedValues.put(KEY_PROFILE_IMAGE_URL, profileImageUri);
+			updatedValues.put(KEY_TWIT_MESSAGE, twitMessage);
+			updatedValues.put(KEY_UP_THUMBS, upThumbs );
+			updatedValues.put(KEY_DOWN_THUMBS, downThumbs );
+			return db.update(DATABASE_TABLE, updatedValues, KEY_TWITID + "=" + twitId, null) ;
+		}
+
+		// ---deletes a particular twits---
+		public boolean deleteTwit(final long twitId)
+		{
+			return db.delete(DATABASE_TABLE, KEY_TWITID + "=" + twitId, null) > 0;
+		}
+
+
+		// ---retrieves all the twits---
+		public Cursor getAllTwits()
+		{
+			return db.query(DATABASE_TABLE, new String[] { KEY_TWITID, KEY_TIMESTAMP, KEY_PROFILE_NAME, KEY_PROFILE_IMAGE_URL, KEY_TWIT_MESSAGE, KEY_UP_THUMBS, KEY_DOWN_THUMBS }, null, null, null,
+					null, KEY_TWITID + " DESC");
 		}
 	}
 
@@ -116,6 +166,7 @@ public class DBAdapter
 
 		@Override
 		public void onCreate(final SQLiteDatabase db){
+			db.execSQL(CREATE_NOTIFICATION_TABLE); //create the nofication table
 		}
 
 		@Override
@@ -210,61 +261,5 @@ public class DBAdapter
 		}
 	}
 
-	// ---opens the database---
-	public DBAdapter open() throws SQLException
-	{
-		db = DBHelper.getWritableDatabase();
-		return this;
-	}
 
-
-	// ---closes the database---
-	public void close()
-	{
-		DBHelper.close();
-	}
-	
-	// ---insert a twit into the database---
-	public long insertTwit(final long twitId, final long timestamp, final String profileName, final String profileImageUri, final String twitMessage, final long upThumbs, final long downThumbs)
-	{
-		final ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_TWITID, twitId);
-		initialValues.put(KEY_TIMESTAMP, timestamp);
-		initialValues.put(KEY_PROFILE_NAME, profileName);
-		initialValues.put(KEY_PROFILE_IMAGE_URL, profileImageUri);
-		initialValues.put(KEY_TWIT_MESSAGE, twitMessage);
-		initialValues.put(KEY_UP_THUMBS, upThumbs );
-		initialValues.put(KEY_DOWN_THUMBS, downThumbs );
-		return db.insert(DATABASE_TABLE, null, initialValues);
-	}
-
-	// ---update a twit into the database---
-	public long updateTwit(final long twitId, final long timestamp, final String profileName, final String profileImageUri, final String twitMessage, final long upThumbs, final long downThumbs)
-	{
-		final ContentValues updatedValues = new ContentValues();
-		updatedValues.put(KEY_TWITID, twitId);
-		updatedValues.put(KEY_TIMESTAMP, timestamp);
-		updatedValues.put(KEY_PROFILE_NAME, profileName);
-		updatedValues.put(KEY_PROFILE_IMAGE_URL, profileImageUri);
-		updatedValues.put(KEY_TWIT_MESSAGE, twitMessage);
-		updatedValues.put(KEY_UP_THUMBS, upThumbs );
-		updatedValues.put(KEY_DOWN_THUMBS, downThumbs );
-		return db.update(DATABASE_TABLE, updatedValues, KEY_TWITID + "=" + twitId, null) ;
-	}
-
-	// ---deletes a particular twits---
-	public boolean deleteTwit(final long twitId)
-	{
-		return db.delete(DATABASE_TABLE, KEY_TWITID + "=" + twitId, null) > 0;
-	}
-
-
-	// ---retrieves all the twits---
-	public Cursor getAllTwits()
-	{
-		return db.query(DATABASE_TABLE, new String[] { KEY_TWITID, KEY_TIMESTAMP, KEY_PROFILE_NAME, KEY_PROFILE_IMAGE_URL, KEY_TWIT_MESSAGE, KEY_UP_THUMBS, KEY_DOWN_THUMBS }, null, null, null,
-				null, KEY_TWITID + " DESC");
-	}
-	
-	
 }

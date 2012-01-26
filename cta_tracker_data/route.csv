@@ -1,0 +1,147 @@
+_id,rtName,rtDir,isBus
+red,red,Howard-bound;95th/Dan Ryan-bound,FALSE
+blue,blue,O'Hare-bound;Forest Park-bound,FALSE
+brn,brown,Kimball-bound;Loop-bound,FALSE
+g,green,Harlem/Lake-bound;Ashland/63rd- or Cottage Grove-bound,FALSE
+org,orange,Loop-bound;Midway-bound,FALSE
+p,purple,Linden-bound;Howard- or Loop-bound,FALSE
+pink,pink,Loop-bound;54th/Cermak-bound,FALSE
+y,yellow,Skokie-bound;Howard-bound,FALSE
+1,Indiana/Hyde Park,North Bound;South Bound,true
+2,Hyde Park Express,North Bound;South Bound,true
+3,King Drive,North Bound;South Bound,true
+4,Cottage Grove,North Bound;South Bound,true
+5,South Shore Night Bus,East Bound;West Bound,true
+6,Jackson Park Express,North Bound;South Bound,true
+7,Harrison,East Bound;West Bound,true
+8,Halsted,North Bound;South Bound,true
+8A,South Halsted,North Bound;South Bound,true
+9,Ashland,North Bound;South Bound,true
+10,Museum of S & I,North Bound;South Bound,true
+11,Lincoln/Sedgwick,North Bound;South Bound,true
+12,Roosevelt,East Bound;West Bound,true
+14,Jeffery Express,North Bound;South Bound,true
+15,Jeffery Local,North Bound;South Bound,true
+17,Westchester,East Bound;West Bound,true
+18,16th/18th,East Bound;West Bound,true
+19,United Center Express,West Bound,true
+20,Madison,East Bound;West Bound,true
+21,Cermak,East Bound;West Bound,true
+22,Clark,North Bound;South Bound,true
+24,Wentworth,North Bound;South Bound,true
+26,South Shore Express,North Bound;South Bound,true
+28,Stony Island,North Bound;South Bound,true
+X28,Stony Island Express,North Bound;South Bound,true
+29,State,North Bound;South Bound,true
+30,South Chicago,North Bound;South Bound,true
+33,Mag Mile Express,North Bound;South Bound,true
+34,South Michigan,North Bound;South Bound,true
+35,35th,East Bound;West Bound,true
+36,Broadway,North Bound;South Bound,true
+39,Pershing,East Bound;West Bound,true
+43,43rd,East Bound;West Bound,true
+44,Wallace-Racine,North Bound;South Bound,true
+47,47th,East Bound;West Bound,true
+48,South Damen,North Bound;South Bound,true
+49,Western,North Bound;South Bound,true
+49A,South Western,North Bound;South Bound,true
+49B,North Western,North Bound;South Bound,true
+50,Damen,North Bound;South Bound,true
+51,51st,East Bound;West Bound,true
+52,Kedzie/California,North Bound;South Bound,true
+52A,South Kedzie,North Bound;South Bound,true
+53,Pulaski,North Bound;South Bound,true
+53A,South Pulaski,North Bound;South Bound,true
+54,Cicero,North Bound;South Bound,true
+54A,North Cicero/Skokie Blvd.,North Bound;South Bound,true
+54B,South Cicero,North Bound;South Bound,true
+55,Garfield,East Bound;West Bound,true
+55A,55th/Austin,East Bound;West Bound,true
+55N,55th/Narragansett,East Bound;West Bound,true
+56,Milwaukee,North Bound;South Bound,true
+56A,North Milwaukee,North Bound;South Bound,true
+57,Laramie,North Bound;South Bound,true
+59,59th/61st,East Bound;West Bound,true
+60,Blue Island/26th,East Bound;West Bound,true
+62,Archer,North Bound;South Bound,true
+62H,Archer/Harlem,East Bound;West Bound,true
+63,63rd,East Bound;West Bound,true
+63W,West 63rd,East Bound;West Bound,true
+64,Foster-Canfield,East Bound;West Bound,true
+65,Grand,East Bound;West Bound,true
+66,Chicago,East Bound;West Bound,true
+67,67th-69th-71st,East Bound;West Bound,true
+68,Northwest Highway,East Bound;West Bound,true
+69,Cumberland/East River,North Bound;South Bound,true
+70,Division,East Bound;West Bound,true
+71,71st/South Shore,North Bound;South Bound,true
+72,North,East Bound;West Bound,true
+73,Armitage,East Bound;West Bound,true
+74,Fullerton,East Bound;West Bound,true
+75,74th-75th,East Bound;West Bound,true
+76,Diversey,East Bound;West Bound,true
+77,Belmont,East Bound;West Bound,true
+78,Montrose,East Bound;West Bound,true
+79,79th,East Bound;West Bound,true
+80,Irving Park,East Bound;West Bound,true
+81,Lawrence,East Bound;West Bound,true
+81W,West Lawrence,East Bound;West Bound,true
+82,Kimball-Homan,North Bound;South Bound,true
+84,Peterson,East Bound;West Bound,true
+85,Central,North Bound;South Bound,true
+85A,North Central,North Bound;South Bound,true
+86,Narragansett/Ridgeland,North Bound;South Bound,true
+87,87th,East Bound;West Bound,true
+88,Higgins,East Bound;West Bound,true
+90,Harlem,North Bound;South Bound,true
+90N,North Harlem,North Bound;South Bound,true
+91,Austin,North Bound;South Bound,true
+92,Foster,East Bound;West Bound,true
+93,California/Dodge,North Bound;South Bound,true
+94,South California,North Bound;South Bound,true
+95E,93rd-95th,East Bound;West Bound,true
+95W,West 95th,East Bound;West Bound,true
+96,Lunt,East Bound;West Bound,true
+97,Skokie,East Bound;West Bound,true
+X98,Avon Express,North Bound;South Bound,true
+100,Jeffery Manor Express,East Bound;West Bound,true
+103,West 103rd,East Bound;West Bound,true
+106,East 103rd,East Bound;West Bound,true
+108,Halsted/95th,North Bound;South Bound,true
+111,Pullman/111th/115th,North Bound;South Bound,true
+112,Vincennes/111th,North Bound;South Bound,true
+119,Michigan/119th,North Bound;South Bound,true
+120,Ogilvie/Wacker Express,North Bound;South Bound,true
+121,Union/Wacker Express,North Bound;South Bound,true
+122,Illinois Center/Ogilvie Express,North Bound;South Bound,true
+123,Illinois Center/Union Express,North Bound;South Bound,true
+124,Navy Pier,East Bound;West Bound,true
+125,Water Tower Express,North Bound;South Bound,true
+126,Jackson,East Bound;West Bound,true
+129,West Loop/South Loop,North Bound;South Bound,true
+130,Museum Campus,East Bound;West Bound,true
+132,Goose Island Express,North Bound;South Bound,true
+134,Stockton/LaSalle Express,North Bound;South Bound,true
+135,Clarendon/LaSalle Express,North Bound;South Bound,true
+136,Sheridan/LaSalle Express,North Bound;South Bound,true
+143,Stockton/Michigan Express,North Bound;South Bound,true
+144,Marine/Michigan Express,North Bound;South Bound,true
+145,Wilson/Michigan Express,North Bound;South Bound,true
+146,Inner Drive/Michigan Express,North Bound;South Bound,true
+147,Outer Drive Express,North Bound;South Bound,true
+148,Clarendon/Michigan Express,North Bound;South Bound,true
+151,Sheridan,North Bound;South Bound,true
+152,Addison,East Bound;West Bound,true
+155,Devon,East Bound;West Bound,true
+156,LaSalle,North Bound;South Bound,true
+157,Streeterville/Taylor,East Bound;West Bound,true
+165,West 65th,East Bound;West Bound,true
+169,69th-UPS Express,East Bound;West Bound,true
+170,U. of Chicago/Midway,East Bound;West Bound,true
+171,U. of Chicago/Hyde Park,North Bound;South Bound,true
+172,U. of Chicago/Kenwood,North Bound;South Bound,true
+192,U. of Chicago Hospitals Express,North Bound;South Bound,true
+201,Central/Ridge,East Bound;West Bound,true
+N201,Central/Sherman,North Bound;South Bound,true
+205,Chicago/Golf,East Bound;West Bound,true
+206,Evanston Circulator,East Bound;West Bound,true

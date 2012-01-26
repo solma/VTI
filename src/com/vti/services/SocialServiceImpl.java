@@ -32,9 +32,11 @@ import com.vti.utils.Log;
 
 import com.vti.Constants;
 import com.vti.R;
+import com.vti.VTIMain;
 import com.vti.services.ISocialService;
 import com.vti.SocialFeed;
 import com.vti.adapters.DBAdapter;
+import com.vti.adapters.DBAdapter.DatabaseHelper;
 import com.vti.managers.AccountManager;
 import com.vti.managers.TwitterManager;
 import com.vti.model.Twit;
@@ -51,11 +53,12 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 			if (!authMgr.isAccountEmpty()) {
 				final List<Twit> twits = feedManager.getSocialFeed();
 				final DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
-				dbAdapter.open();
+				final DatabaseHelper dbHelper=dbAdapter.getDatabaseHelper();
+				dbHelper.open();
 				//updated local notification database
 				if (twits != null)
 					for (final Twit twit : twits) {
-						final long noOfRowsEffected = dbAdapter.updateTwit(
+						final long noOfRowsEffected = dbHelper.updateTwit(
 								twit.getTwitId(), twit.getTimestamp(), twit.getProfileName(),
 								twit.getImageUrl(), twit.getTwitMessage(),
 								twit.getUpThumbs(), twit.getDownThumbs());
@@ -64,12 +67,12 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 						// Check for new notifications
 						if (noOfRowsEffected < 1) {
 							// Insert if not already present
-							dbAdapter.insertTwit(twit.getTwitId(), twit.getTimestamp(),twit.getProfileName(), 
+							dbHelper.insertTwit(twit.getTwitId(), twit.getTimestamp(),twit.getProfileName(), 
 									twit.getImageUrl(),	twit.getTwitMessage(),
 									twit.getUpThumbs(), twit.getDownThumbs());
 						}
 					}
-				dbAdapter.close();
+				dbHelper.close();
 				//return twits;
 				return getFromDB();
 			} else {
@@ -83,11 +86,12 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 			if (!authMgr.isAccountEmpty()) {
 				final List<Twit> twits = feedManager.getUserTimeline(userName);
 				final DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
-				dbAdapter.open();
+				final DatabaseHelper dbHelper=dbAdapter.getDatabaseHelper();
+				dbHelper.open();
 				//updated local notification database
 				if (twits != null)
 					for (final Twit twit : twits) {
-						final long noOfRowsEffected = dbAdapter.updateTwit(
+						final long noOfRowsEffected = dbHelper.updateTwit(
 								twit.getTwitId(), twit.getTimestamp(),twit.getProfileName(),
 								twit.getImageUrl(), twit.getTwitMessage(),
 								twit.getUpThumbs(), twit.getDownThumbs());
@@ -96,12 +100,12 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 						// Check for new notifications
 						if (noOfRowsEffected < 1) {
 							// Insert if not already present
-							dbAdapter.insertTwit(twit.getTwitId(), twit.getTimestamp(),twit.getProfileName(), 
+							dbHelper.insertTwit(twit.getTwitId(), twit.getTimestamp(),twit.getProfileName(), 
 									twit.getImageUrl(),	twit.getTwitMessage(),
 									twit.getUpThumbs(), twit.getDownThumbs());
 						}
 					}
-				dbAdapter.close();
+				dbHelper.close();
 				//return twits;
 				return getFromDB();
 			} else {
@@ -115,8 +119,9 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 		 */
 		public List<Twit> getFromDB() throws RemoteException{
 			final DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
-			dbAdapter.open();
-			final Cursor cursor = dbAdapter.getAllTwits();
+			final DatabaseHelper dbHelper=dbAdapter.getDatabaseHelper();
+			dbHelper.open();
+			final Cursor cursor = dbHelper.getAllTwits();
 			try {
 				//final int dbEntries = cursor.getCount();
 				final List<Twit> dbTwits = new ArrayList<Twit>();
@@ -131,7 +136,7 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 				if (null != cursor) {
 					cursor.close();
 				}
-				dbAdapter.close();
+				dbHelper.close();
 			}
 		}
 
@@ -194,16 +199,17 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 					final List<Twit> twits = feedManager.getSocialFeed();
 					final DBAdapter dbAdapter = new DBAdapter(
 							getApplicationContext());
-					dbAdapter.open();
+					final DatabaseHelper dbHelper=dbAdapter.getDatabaseHelper();
+					dbHelper.open();
 					if (twits != null)
 						for (final Twit twit : twits) {
-							final long noOfRowsEffected = dbAdapter.updateTwit(
+							final long noOfRowsEffected = dbHelper.updateTwit(
 									twit.getTwitId(), twit.getTimestamp(),twit.getProfileName(),
 									twit.getImageUrl(), twit.getTwitMessage(),
 									twit.getUpThumbs(), twit.getDownThumbs());
 							// Check for new notification
 							if (noOfRowsEffected < 1) {
-								dbAdapter.insertTwit(twit.getTwitId(), twit.getTimestamp(),twit.getProfileName(),
+								dbHelper.insertTwit(twit.getTwitId(), twit.getTimestamp(),twit.getProfileName(),
 										twit.getImageUrl(), twit.getTwitMessage(),
 										twit.getUpThumbs(), twit.getDownThumbs());
 								// Notify so that user comes to know about this
@@ -214,7 +220,7 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 					if (sendNotification) {
 						sendNotification(notificationMsgs);
 					}
-					dbAdapter.close();
+					dbHelper.close();
 				}
 			}
 		};
@@ -234,7 +240,7 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 		final CharSequence contentTitle = "New VTI Notifications";
 		final CharSequence contentText = "You have new notificaions!";
 		//FIXME: Intent should have VTIMAIN?
-		final Intent notificationIntent = new Intent(this, SocialFeed.class);
+		final Intent notificationIntent = new Intent(this, VTIMain.class);
 		notificationIntent.putExtra("Refresh", true);
 		Log.e(TAG, String.valueOf(notificationMsgs.size()) );
 		final SharedPreferences settings = getSharedPreferences(

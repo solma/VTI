@@ -271,22 +271,31 @@ public class RouteSubscription extends MapActivity {
 	
 	@Override
     protected void onPause() {
-        //remove the listener
-        locMgr.getLocationManager().removeUpdates(mHandler);
-        super.onPause();
+		super.onPause();
     }
  
 	@Override
     protected void onResume() {
-        //add the listener again
+		super.onResume();
+		//add the listener again
         locMgr.getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MINTIME, Constants.MINDISTANCE, mHandler);
-        super.onResume();
     }
+	
+	protected void onDestroy(){
+		super.onDestroy();
+		try{
+			locMgr.getLocationManager().removeUpdates(mHandler);
+		}catch(IllegalArgumentException e){
+		}
+	}
 	
 	@Override
 	protected void onStop(){
-		locMgr.getLocationManager().removeUpdates(mHandler);
-	    super.onStop();
+		super.onStop();
+		try{
+			locMgr.getLocationManager().removeUpdates(mHandler);
+		}catch(IllegalArgumentException e){
+		}
 		// We need an Editor object to make preference changes.
 		// All objects are from android.context.Context
 		SharedPreferences settings = getSharedPreferences(Constants.ROUTE_PREFERENCE_FILE, 0);
@@ -397,11 +406,15 @@ public class RouteSubscription extends MapActivity {
 		dialog.show();
 	} 
 	
-	protected void unsubscribeLastRoute(){
-		if(vHandler!=null)
+	private void unsubscribeLastRoute(){
+		try{
 			locMgr.getLocationManager().removeUpdates(vHandler);
-		if(vtiAccounts.size()>0)
+		}catch(IllegalArgumentException e){
+		}
+
+		if(vtiAccounts.size()>0){
 			new UnFollowAsyncTask().execute();
+		}
 	}
 	
 	private void subscribeTransitRoute(ArrayList<String> routes){

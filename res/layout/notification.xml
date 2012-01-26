@@ -37,10 +37,12 @@
 		    android:background="@drawable/publish" >
 		</ImageButton>
 		<!-- 	android:layout_alignParentLeft="true" android:layout_weight="1"-->
+		<!--  
 		<ImageButton android:id="@+id/route" android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
 			android:background="@drawable/route"></ImageButton>
+		-->
 		<ImageButton
 		    android:id="@+id/follow_unfollow"
 		    android:layout_width="wrap_content"
@@ -60,7 +62,7 @@
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:layout_weight="1"
-		    android:layout_toLeftOf="@id/route"
+		    android:layout_toLeftOf="@id/publish"
 		    android:background="@drawable/unfollow" >
 		</ImageButton>
 	</LinearLayout>

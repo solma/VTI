@@ -96,7 +96,7 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 	private ImageButton followUnfollowButton;
 	private ImageButton followButton;
 	private ImageButton unfollowButton;
-	private ImageButton routeButton;
+	//private ImageButton routeButton;
 		
 	private ServiceConnection connection = new ServiceConnection() {
 		// Called when the connection with the service is established
@@ -317,14 +317,14 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 	protected void onCreate(final Bundle savedInstanceState) {
 		try {
 			super.onCreate(savedInstanceState);
-			setContentView(R.layout.feed_list);
+			setContentView(R.layout.notification);
 			Log.d(TAG, "On Create");
 			refreshButton = (ImageButton) findViewById(R.id.force_refresh);
 			publishButton = (ImageButton)findViewById(R.id.publish);
 			followUnfollowButton = (ImageButton)findViewById(R.id.follow_unfollow);
 			followButton = (ImageButton)findViewById(R.id.follow);
 			unfollowButton = (ImageButton)findViewById(R.id.unfollow);
-			routeButton =(ImageButton)findViewById(R.id.route);
+			//routeButton =(ImageButton)findViewById(R.id.route);
 			
 			publishButton.setOnClickListener(new OnClickListener() {
 				@Override
@@ -356,18 +356,19 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 				}
 			});
 			
+			/*
 			routeButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(final View v) {
 					handleRoute();
 				}
-			});
+			});*/
 			
 			authMgr = new AccountManager(getApplicationContext());
 	
 			if (null != authMgr.getTwitterFactory()) {
 				Log.e(TAG, "going to bind the service");
-				bindService(new Intent(getApplicationContext(),
+				getApplicationContext().bindService(new Intent(getApplicationContext(),
 						SocialServiceImpl.class), connection,
 						Context.BIND_AUTO_CREATE);
 			}
@@ -474,6 +475,9 @@ public class SocialFeed extends ListActivity implements CustomEventListener{
 		});
 		
 		dialog.show();
+
+		final Intent navIntent = new Intent(getApplicationContext(),Tracker.class);
+		startActivity(navIntent);
 	}
 	/**
 	 * handle follow click 

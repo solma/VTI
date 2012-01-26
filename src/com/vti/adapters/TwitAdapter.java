@@ -97,7 +97,7 @@ public class TwitAdapter extends BaseAdapter {
 		if (row == null) {
 			final LayoutInflater vi = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			row = vi.inflate(R.layout.list_item, null);
+			row = vi.inflate(R.layout.notification_row, null);
 		}
 
 		final Twit twit = (Twit) getItem(position);

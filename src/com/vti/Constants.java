@@ -61,17 +61,17 @@ public class Constants {
 	public static final String ACCESS_TOKEN = "AccessToken";
 	public static final String TOKEN_SECRET = "TokenSecret";
 	//route related settings
+	public static final String ROUTE_PREFERENCE_FILE="RouteSubscription";
 	public static final String DELIMITER="VTI_BREAK";
 	public static final String FROM_HISTORY="FromHistory";
 	public static final String TO_HISTORY="ToHistory";
 	public static final int HISTORY_SIZE=10;
 	public static final String LAST_VTI_ACCOUNTS="LastVTIAccounts";
-	public static final String ROUTE_PREFERENCE_FILE="RouteSubscription";
 	// other settings
 	public static final String SETTING_PREFERENCE_FILE="SettingPreferenceFile";
 	public static final String VOICE_NOTIFY="VoiceNotify";
 	public static final String UPDATE_FREQUENCY="UpdateFrequency";
-	
+	public static final String CTA_TABLE="CTATable";
 	/** 
 	 * Time Units in milliseconds
 	 */
@@ -113,4 +113,9 @@ public class Constants {
 	public static final double NORTH=41.9546187;
 	public static final int EDGE_SIZE=5; //each edge is eqully partitioned into 5 sections
 	
+	/**
+	 * Tracker Info.
+	 */
+	public static final String CTA_BUS_TRACKER_KEY="7tFU9dumgYNZshTuPjKRhZJTA";
+	public static final String CTA_TRAIN_TRACKER_KEY="1501afcdab194e6e9d286199bec4a19a";
 }

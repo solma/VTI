@@ -18,8 +18,11 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.TabHost;
 
+import com.vti.tracker.AllRoutes;
+import com.vti.tracker.NearbyStops;
 
-public class VTIMain extends TabActivity {
+
+public class Tracker extends TabActivity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,28 +34,21 @@ public class VTIMain extends TabActivity {
         Intent intent;  // Reusable Intent for each tab
 
         // Create an Intent to launch an Activity for the tab (to be reused)
-        intent = new Intent().setClass(this, SocialFeed.class);
+        intent = new Intent().setClass(this, NearbyStops.class);
 
         // Initialize a TabSpec for each tab and add it to the TabHost
-        spec = tabHost.newTabSpec("Notifications").setIndicator("Notifications"
-        					//,res.getDrawable(R.drawable.ic_tab_notification)
-        					).setContent(intent);
-        tabHost.addTab(spec);
-
-        // Do the same for the other tabs
-        intent = new Intent().setClass(this, RouteSubscription.class);
-        spec = tabHost.newTabSpec("Routes").setIndicator("Routes"
+        spec = tabHost.newTabSpec("Nearby").setIndicator("Nearby"
         		 		//,res.getDrawable(R.drawable.ic_tab_notification)
         		 		).setContent(intent);
         tabHost.addTab(spec);
 
-        
-        intent = new Intent().setClass(this, Tracker.class);
-        spec = tabHost.newTabSpec("Tracker").setIndicator("Tracker"
-                          //,res.getDrawable(R.drawable.ic_tab_songs)
-                      	).setContent(intent);
+
+        // Do the same for the other tabs
+        intent = new Intent().setClass(this, AllRoutes.class);
+        spec = tabHost.newTabSpec("All Routes").setIndicator("All Routes"
+				//,res.getDrawable(R.drawable.ic_tab_notification)
+				).setContent(intent);
         tabHost.addTab(spec);
-		
 
         tabHost.setCurrentTab(1);
     }

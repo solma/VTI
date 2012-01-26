@@ -17,15 +17,21 @@
 				<data android:scheme="VTI" android:host="twitter"></data>
 			</intent-filter>
 		</activity>
-		<activity android:name=".SocialFeed"
+		<activity android:name=".VTIMain"
 			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 			android:screenOrientation="portrait" android:launchMode="singleTask"></activity>
-		<activity android:name=".VTIMain"
+		<activity android:name=".SocialFeed"
 			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 			android:screenOrientation="portrait" android:launchMode="singleTask"></activity>
 		<activity android:name=".AboutUs"></activity>
 		<activity android:name=".Help"></activity>
 		<activity android:name=".RouteSubscription"></activity>
+		<activity android:name=".Tracker"></activity>
+		<activity android:name=".tracker.AllRoutes"></activity>
+		<activity android:name=".tracker.AllStops"></activity>
+		<activity android:name=".tracker.NearbyStops"></activity>
+		<activity android:name=".tracker.RouteSelectDirection"></activity>
+		<activity android:name=".tracker.Prediction"></activity>
 		<receiver android:name=".AlarmReceiver" android:enabled="true">
 		</receiver>
 		<reciever android:name="com.vti.BatteryBroadcastReceiver">

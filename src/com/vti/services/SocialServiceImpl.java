@@ -233,6 +233,7 @@ public class SocialServiceImpl extends Service implements TextToSpeech.OnInitLis
 		final Context context = getApplicationContext();
 		final CharSequence contentTitle = "New VTI Notifications";
 		final CharSequence contentText = "You have new notificaions!";
+		//FIXME: Intent should have VTIMAIN?
 		final Intent notificationIntent = new Intent(this, SocialFeed.class);
 		notificationIntent.putExtra("Refresh", true);
 		Log.e(TAG, String.valueOf(notificationMsgs.size()) );

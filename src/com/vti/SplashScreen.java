@@ -12,7 +12,13 @@
  */
 package com.vti;
 
+import java.io.IOException;
 import java.net.URI;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
@@ -23,15 +29,20 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import com.vti.utils.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
+import com.vti.adapters.DBAdapter;
+import com.vti.adapters.DBAdapter.CTATrackerDatabaseHelper;
 import com.vti.managers.AccountManager;
 import com.vti.managers.TwitterManager;
+import com.vti.utils.Log;
 
 public class SplashScreen extends Activity {
 	
@@ -42,7 +53,7 @@ public class SplashScreen extends Activity {
 	
 	private ImageButton twitterButton;
 	private AccountManager accMgr;
-
+	
 	/**
 	 * Called when the activity is first created. Here we will setup oAuth
 	 * related implementations.
@@ -54,9 +65,9 @@ public class SplashScreen extends Activity {
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.login);
+					
 			twitterButton = (ImageButton) findViewById(R.id.vti);
 			createAuthorizationRequests(twitterButton);
-			
 			accMgr = new AccountManager(getApplicationContext());
 
 			setAlarm();
@@ -137,6 +148,13 @@ public class SplashScreen extends Activity {
 	protected void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
 		try {
+			final SharedPreferences settings = getSharedPreferences(
+					Constants.SETTING_PREFERENCE_FILE , 0);
+			boolean tracker_table_ready = settings.getBoolean(Constants.CTA_TABLE, false);
+			if(!tracker_table_ready){
+				new BuildCTATables().doInBackground();
+			}
+			
 			saveAccountInfo(intent);
 			navigateToMain();
 		} catch (final Exception e) {
@@ -149,7 +167,7 @@ public class SplashScreen extends Activity {
 	 */
 	private void navigateToMain() {
 		//TODO This is the switcher  
-		final Intent navIntent = new Intent(getApplicationContext(),SocialFeed.class);
+		final Intent navIntent = new Intent(getApplicationContext(),VTIMain.class);
 		finish();
 		startActivity(navIntent);
 	}
@@ -235,4 +253,30 @@ public class SplashScreen extends Activity {
 		super.onStop();
 		Log.e(TAG , "ON STOP");
 	}
+	
+	/**
+	 * copy the CTA Tracker database
+	 */
+	private class BuildCTATables extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected Void doInBackground(final Void... params) {
+			final DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
+			CTATrackerDatabaseHelper myDbHelper = dbAdapter.getCTATrackerDBHelper();
+		    try {
+		       	myDbHelper.createCTADatabase();
+		       	myDbHelper.close();
+		 	} catch (IOException ioe) {
+		 		throw new Error("Unable to create database");
+		 	}
+
+			final SharedPreferences settings = getSharedPreferences(
+					Constants.SETTING_PREFERENCE_FILE , 0);
+			Editor editor = settings.edit();
+			editor.putBoolean(Constants.CTA_TABLE, true);
+			editor.commit();
+			return null;
+		}
+	
+	};
+
 }

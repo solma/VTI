@@ -272,6 +272,10 @@ public class RouteSubscription extends MapActivity {
 	@Override
     protected void onPause() {
 		super.onPause();
+		try{
+			locMgr.getLocationManager().removeUpdates(mHandler);
+		}catch(IllegalArgumentException e){
+		}
     }
  
 	@Override

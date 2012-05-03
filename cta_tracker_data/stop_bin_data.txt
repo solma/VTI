@@ -1,0 +1,11 @@
+Stat info.
+
+North Pole:   42.07315
+South Pole:   41.64408
+#NS Bin: 10
+NS Bin_Num: 0.042907
+
+West Pole:-87.9042   
+East Pole:-87.5257
+#NS Bin: 10 
+WE Bin_Num: 0.03785

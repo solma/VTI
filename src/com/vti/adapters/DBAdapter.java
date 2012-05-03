@@ -254,10 +254,10 @@ public class DBAdapter
 			return myDataBase.query(CTA_STOP, new String[] { "_id", "stpName", "stpLat", "stpLon", "rtId", "rtDir", "isBus" }, "rtId='"+rtId+"' and rtDir='"+rtDir+"'", null, null, null, "_id ASC");
 		}
 		
-		// ---retrieves all the Stops-
-		public Cursor getAllStops()
+		// ---retrieves all the Stops within the Bin-
+		public Cursor getAllStops(int stpLat_bin, int stpLon_bin)
 		{
-			return myDataBase.query(CTA_STOP, new String[] { "_id", "stpName", "stpLat", "stpLon", "rtId", "rtDir", "isBus" }, null, null, null, null, "_id ASC");
+			return myDataBase.query(CTA_STOP, new String[] { "_id", "stpName", "stpLat", "stpLon", "rtId", "rtDir", "isBus", "stpLat_bin", "stpLon_bin" }, "stpLat_bin='"+stpLat_bin+"' and stpLon_bin='"+stpLon_bin+"'", null, null, null, "_id ASC");
 		}
 	}
 

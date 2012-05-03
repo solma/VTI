@@ -22,6 +22,11 @@ public class CTAStop {
 		isBus=yesOrNo;
 	}
 	
+	@Override
+	public boolean equals(Object o){
+		return stpId.equals(((CTAStop) o).stpId());
+	}
+	
 	public void setDist(double d){
 		dist=d;
 	}

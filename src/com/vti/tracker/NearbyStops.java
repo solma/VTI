@@ -63,6 +63,10 @@ public class NearbyStops extends ListActivity {
 		}
 	}
 	
+	protected void onStop(){
+		super.onStop();
+	}
+	
 	protected void onDestroy(){
 		super.onDestroy();
 		if(null!=ll){
@@ -80,8 +84,10 @@ public class NearbyStops extends ListActivity {
     		int size=allStops.size();
 	    	values=new String[size>MAX_SIZE?MAX_SIZE:size];
 	    	DecimalFormat df = new DecimalFormat("#.##");
+	    	Log.e(TAG, "length"+String.valueOf(values.length));
 			for(int i=0;i<values.length;i++){
 				CTAStop stop=allStops.get(i);
+				Log.e(TAG, stop.stpName());
 				values[i]=stop.rtId()+"\t\t"+stop.rtDir()+"\n"+stop.stpName()+"\n"+df.format(stop.dist())+" miles";
 			}
 	    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(NearbyStops.this,
@@ -114,33 +120,56 @@ public class NearbyStops extends ListActivity {
 	 * @return nearby stops 
 	 */
 	private void getNearbyStops(Location cur){
+		allStops.clear();
+		final double WEST_POLE=-87.9042;
+		final double SOUTH_POLE=41.64408;
+		final double LON_BIN=0.03785;
+		final double LAT_BIN=0.042907;
+		final int MAX_DISTANCE=3; //in miles
+		
 		final DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
-		final int MAX_DISTANCE=3;
+		
 		CTATrackerDatabaseHelper myDbHelper = dbAdapter.getCTATrackerDBHelper();
 		Cursor cursor=null;
 		double lat1=cur.getLatitude();
 		double lon1=cur.getLongitude();
+		int latBin=(int)((lat1-SOUTH_POLE)/LAT_BIN);
+		int lonBin=(int)((lon1-WEST_POLE)/LON_BIN);
 		
 	 	try {
 	 		myDbHelper.openDataBase();
-	 		cursor = myDbHelper.getAllStops();
-	 		//int count=0;
-			while (cursor.moveToNext()) {
-				try{
-					double lat2=Double.parseDouble(cursor.getString(2));
-					double lon2=Double.parseDouble(cursor.getString(3));
-					double dist=distBetween(lat1, lon1, lat2, lon2);
-					if(dist<MAX_DISTANCE){
-						CTAStop stop=new CTAStop(cursor.getString(0), cursor.getString(1), cursor.getString(2), 
-								cursor.getString(3), cursor.getString(4), cursor.getString(5),Boolean.valueOf(cursor.getString(6)));
-						stop.setDist(dist);
-						allStops.add(stop);
-						//count++;
+	 		int[][] neighborBins=new int[5][2];
+	 		neighborBins[0][0]=latBin; neighborBins[0][1]=lonBin;
+	 		neighborBins[1][0]=latBin-1; neighborBins[1][1]=lonBin;
+	 		neighborBins[2][0]=latBin+1; neighborBins[2][1]=lonBin;
+	 		neighborBins[3][0]=latBin; neighborBins[3][1]=lonBin-1;
+	 		neighborBins[4][0]=latBin; neighborBins[4][1]=lonBin+1;
+	 		
+	 		for(int i=0;i<neighborBins.length;i++){
+		 		cursor = myDbHelper.getAllStops(neighborBins[i][0],neighborBins[i][1]);
+		 		//int count=0;
+				while (cursor.moveToNext()) {
+					try{
+						double lat2=Double.parseDouble(cursor.getString(2));
+						double lon2=Double.parseDouble(cursor.getString(3));
+						double dist=distBetween(lat1, lon1, lat2, lon2);
+						if(dist<MAX_DISTANCE){
+							CTAStop stop=new CTAStop(cursor.getString(0), cursor.getString(1), cursor.getString(2), 
+									cursor.getString(3), cursor.getString(4), cursor.getString(5),Boolean.valueOf(cursor.getString(6)));
+							stop.setDist(dist);
+							int idx=allStops.indexOf(stop);
+							if(idx<0){//not exist;
+								allStops.add(stop);
+							}
+							//count++;
+						}
+					}catch(Exception e){
+						continue;
 					}
-				}catch(Exception e){
-					continue;
 				}
-			}
+	 		}
+	 		
+
 	 	}catch(SQLException e){
 	 		Log.d(TAG,Log.stack2string(e));
 	 	}finally {
